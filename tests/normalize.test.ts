@@ -36,4 +36,11 @@ describe('normalizeShoppingResult', () => {
     const p = normalizeShoppingResult({ ...raw, extracted_price: undefined }, 'tech', 520);
     expect(p?.price_kzt).toBe(13510);
   });
+  it('проставляет subcategory, по умолчанию null', () => {
+    const withSub = normalizeShoppingResult(raw, 'audio', 520, 'earbuds');
+    expect(withSub?.category).toBe('audio');
+    expect(withSub?.subcategory).toBe('earbuds');
+    const noSub = normalizeShoppingResult(raw, 'audio', 520);
+    expect(noSub?.subcategory).toBeNull();
+  });
 });

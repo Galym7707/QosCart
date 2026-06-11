@@ -2,13 +2,13 @@
 import { usdToKzt } from './currency';
 
 export type NormalizedProduct = {
-  title: string; category: string; source: string;
+  title: string; category: string; subcategory: string | null; source: string;
   product_url: string | null; image_url: string | null;
   price_kzt: number; rating: number | null; reviews_count: number | null;
   raw: unknown;
 };
 
-export function normalizeShoppingResult(r: any, category: string, rate?: number): NormalizedProduct | null {
+export function normalizeShoppingResult(r: any, category: string, rate?: number, subcategory: string | null = null): NormalizedProduct | null {
   const title = (r?.title ?? '').trim();
   const usd = typeof r?.extracted_price === 'number'
     ? r.extracted_price
@@ -17,6 +17,7 @@ export function normalizeShoppingResult(r: any, category: string, rate?: number)
   return {
     title,
     category,
+    subcategory,
     source: `google_shopping:${r?.source ?? 'unknown'}`,
     product_url: r?.link ?? r?.product_link ?? null,
     image_url: r?.thumbnail ?? null,
