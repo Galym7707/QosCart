@@ -16,6 +16,8 @@ export function useVoice(onFinal: (text: string) => void) {
     const SR = (window as any).SpeechRecognition ?? (window as any).webkitSpeechRecognition;
     setSupported(!!SR);
     setTtsOn(localStorage.getItem('qos_tts') !== '0');
+    window.speechSynthesis?.getVoices(); // прогрев async-списка голосов (Chrome)
+    return () => { try { recRef.current?.stop(); } catch {} window.speechSynthesis?.cancel(); };
   }, []);
 
   const start = useCallback(() => {
