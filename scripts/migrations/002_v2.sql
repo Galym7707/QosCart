@@ -10,6 +10,7 @@ create table if not exists likes (
 );
 create index if not exists likes_user_idx on likes(user_id);
 
+-- модель направленная: дружба = две строки (A→B и B→A); unique(user_id, friend_id) действует на направление
 create table if not exists friendships (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references users(id),
