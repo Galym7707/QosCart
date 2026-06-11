@@ -39,7 +39,7 @@ export default function Product() {
     if (!u) { setErrText('Сначала пройдите регистрацию'); setState('error'); return; }
     const res = await fetch('/api/pools/join', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ poolId: pool.id, userId: u.id }) });
     if (res.ok) { setState('joined'); }
-    else { const { error } = await res.json(); setErrText({ expired: 'Группа истекла', duplicate: 'Вы уже в группе (1 устройство = 1 слот)', not_verified: 'Нужна верификация', closed: 'Группа закрыта' }[error as string] ?? error); setState('error'); }
+    else { const { error } = await res.json(); setErrText({ expired: 'Группа истекла', duplicate: 'Вы уже в группе (1 устройство = 1 слот)', not_verified: 'Нужна верификация', closed: 'Группа закрыта', not_found: 'Группа недоступна' }[error as string] ?? error); setState('error'); }
   }
 
   return (
@@ -76,9 +76,4 @@ export default function Product() {
           <p className="font-semibold text-sm text-red-700">Группа не собралась: {pool.current_participants}/{pool.min_participants} за 24 ч</p>
           <button className="border border-red-300 rounded-xl py-3 text-sm bg-white">↩️ Вернуть средства (автоматически)</button>
           <button className="border rounded-xl py-3 text-sm bg-white">⬆️ Доплатить до тира «от 5»: {formatKzt(currentPrice(p.price_kzt, 5))}</button>
-          <button className="border rounded-xl py-3 text-sm bg-white">📤 Расшарить ссылку: +2 часа таймера</button>
-        </div>
-      )}
-    </div>
-  );
-}
+          <button className="border rounded-xl py-3 text-sm bg-white">📤 Расшарить ссылку: +2 часа таймера</bu

@@ -20,6 +20,7 @@ npm install
 2. Открыть **SQL Editor** → вставить содержимое `scripts/schema.sql` → нажать **Run**.
 3. В Table Editor должны появиться 4 таблицы: `users`, `products`, `pools`, `pool_members`.
 4. Включить realtime: **Database → Publications → supabase_realtime** → найти таблицу `pools` → включить. Если строка `alter publication supabase_realtime add table pools;` не сработала в SQL Editor — включите вручную через этот интерфейс.
+5. RLS на таблицах оставить ВЫКЛЮЧЕННЫМ (демо; онбординг пишет в users anon-ключом).
 
 ### в) Переменные окружения
 
@@ -66,12 +67,12 @@ npm run dev
 Код подтверждения OTP в демо: **000000**
 
 1. Регистрация по номеру → реальный SMS-код на телефон команды → Trust Passport (verified badge).
-2. Чат: «Найди беспроводные наушники до 25 000 KZT для учёбы» → агент: live-поиск → 3 карточки с source и last_checked_at.
+2. Чат: «Найди беспроводные наушники до 25 000 KZT для учёбы» → агент ищет в своём каталоге и дозагружает live из SerpAPI, если результатов мало → 3 карточки с source и last_checked_at.
 3. Карточка: retail vs group price, ladder 1/5/10/20, прогресс 7/10, таймер TTL.
 4. Два окна рядом: Join на экране А → у экрана Б прогресс-бар двигается в ту же секунду (Supabase Realtime) → 8/10.
 5. Контроль реализма: пул с истёкшим TTL → «Группа не собралась: возврат / доплата до тира 5 / +2 часа за шеринг».
-6. Checkout preview: «human confirmation required» — агент не покупает сам.
-7. Финал: Admin Ingestion Dashboard — статусы источников, последние fetches.
+6. Открыть пул 9/10 → второй join → 10/10, статус unlocked, цена Main group активна.
+7. Открыть истёкший пул → экран провала: возврат / доплата до тира 5 / +2 часа за шеринг.
 
 ---
 

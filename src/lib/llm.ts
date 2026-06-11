@@ -12,7 +12,12 @@ export function fallbackParse(text: string): Intent {
   const budget_max = budget ? parseInt(budget[1].replace(/\s/g, ''), 10) : null;
   let city = 'Almaty';
   for (const [k, v] of Object.entries(CITIES)) if (text.toLowerCase().includes(k)) { city = v; break; }
-  return { query_en: text.replace(/до\s*\d[\d\s]*\s*(kzt|тг|тенге|₸)/i, '').trim(), budget_max, city, category: null };
+  const query_en = text
+    .replace(/до\s*\d[\d\s]*\s*(kzt|тг|тенге|₸)/i, '')
+    .replace(/\b(найди|найти|купи|купить|нужен|нужна|нужно|хочу)\b/gi, '')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/^[\s,]+|[\s,]+$/g, '');
+  return { query_en, budget_max, city, category: null };
 }
 
 function groq() {

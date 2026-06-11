@@ -12,10 +12,11 @@ export async function POST(req: Request) {
   const budget = intent.budget_max ?? profile?.budget_kzt ?? null;
 
   // 1) своя база (сид + накопленный live)
-  let { data: products = [] } = await db.from('products')
+  const { data: productsData } = await db.from('products')
     .select('*')
     .ilike('title', `%${intent.query_en.split(' ')[0]}%`)
     .limit(30);
+  let products = productsData ?? [];
 
   // 2) live-дозагрузка, если мало — результаты вливаются в каталог
   if ((products?.length ?? 0) < 3) {
@@ -49,5 +50,4 @@ export async function POST(req: Request) {
     ? await explain(ranked[0].chips, pool ? { name: pool.name, current_participants: pool.current_participants, min_participants: pool.min_participants } : null, message)
     : 'Ничего не нашёл — попробуйте переформулировать.';
 
-  return NextResponse.json({ intent, products: ranked, pool, explanation });
-}
+  return NextResponse.json({ intent, prod
