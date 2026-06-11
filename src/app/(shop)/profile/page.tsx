@@ -49,7 +49,7 @@ export default function Profile() {
       method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ userId: user.id }),
     }).then(x => x.json());
-    setFriends(f => [...f, ...(d.friends ?? [])]);
+    setFriends(f => [...f, ...((d.friends ?? []) as Friend[]).filter(x => !f.some(y => y.id === x.id))]);
   }
 
   if (!user) return null;

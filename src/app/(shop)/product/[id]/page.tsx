@@ -86,7 +86,7 @@ function ProductInner() {
             {friendNames.length > 0 && (
               <div className="flex items-center gap-2 text-xs text-emerald-700">
                 <FriendAvatars names={friendNames} />
-                {friendNames.length === 1 ? `${friendNames[0]} уже в группе` : `${friendNames.length} друзей уже в группе`}
+                {friendNames.length === 1 ? `${friendNames[0]} уже в группе` : `${friendNames.length} ${friendNames.length < 5 ? 'друга' : 'друзей'} уже в группе`}
               </div>
             )}
             <PoolProgress pool={pool} />
