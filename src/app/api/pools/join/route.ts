@@ -4,7 +4,7 @@ import { adminClient } from '@/lib/supabase';
 import { canJoin, applyJoin } from '@/lib/joinRules';
 
 export async function POST(req: Request) {
-  const { poolId, userId } = await req.json();
+  const { poolId, userId, inviterId } = await req.json();
   const db = adminClient();
 
   const [{ data: pool }, { data: user }, { data: members }] = await Promise.all([
@@ -21,6 +21,13 @@ export async function POST(req: Request) {
     pool_id: poolId, user_id: userId, phone_hash: user.phone_hash, device_id: user.device_id,
   });
   if (insErr) return NextResponse.json({ error: 'duplicate' }, { status: 409 }); // unique-constraint = второй рубеж
+
+  if (inviterId && inviterId !== userId) {
+    await db.from('friendships').upsert([
+      { user_id: userId, friend_id: inviterId, source: 'invite' },
+      { user_id: inviterId, friend_id: userId, source: 'invite' },
+    ], { onConflict: 'user_id,friend_id', ignoreDuplicates: true });
+  }
 
   const next = applyJoin(pool);
   const { data: updated } = await db.from('pools').update(next).eq('id', poolId).select('*').single();
