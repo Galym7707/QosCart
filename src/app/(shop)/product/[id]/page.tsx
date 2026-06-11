@@ -72,7 +72,7 @@ export default function Product() {
               {unlock && <span className="text-zinc-500"> · ещё {unlock.needed} чел до {formatKzt(unlock.price)}</span>}</p>
             {state !== 'joined'
               ? <button onClick={join} className="bg-black text-white rounded-2xl py-4 font-semibold">Присоединиться к группе</button>
-              : <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-2xl p-3 text-sm">Слот зарезервирован! Позовите друга — ссылка скопирована.</div>}
+              : <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-2xl p-3 text-sm">✅ Слот зарезервирован! Позовите друга — ссылка скопирована.</div>}
             {state === 'error' && <p className="text-red-500 text-sm">{errText}</p>}
           </div>
         )}
@@ -80,9 +80,9 @@ export default function Product() {
         {pool && expired && (
           <div className="border border-red-200 bg-red-50 rounded-2xl p-4 flex flex-col gap-2">
             <p className="font-semibold text-sm text-red-700">Группа не собралась: {pool.current_participants}/{pool.min_participants} за 24 ч</p>
-            <button className="border border-red-300 rounded-xl py-3 text-sm bg-white">Вернуть средства (автоматически)</button>
-            <button className="border rounded-xl py-3 text-sm bg-white">Доплатить до тира «от 5»: {formatKzt(currentPrice(p.price_kzt, 5))}</button>
-            <button className="border rounded-xl py-3 text-sm bg-white">Расшарить ссылку: +2 часа таймера</button>
+            <button className="border border-red-300 rounded-xl py-3 text-sm bg-white">↩️ Вернуть средства (автоматически)</button>
+            <button className="border rounded-xl py-3 text-sm bg-white">⬆️ Доплатить до тира «от 5»: {formatKzt(currentPrice(p.price_kzt, 5))}</button>
+            <button className="border rounded-xl py-3 text-sm bg-white">📤 Расшарить ссылку: +2 часа таймера</button>
           </div>
         )}
       </div>
