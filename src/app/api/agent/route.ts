@@ -50,4 +50,5 @@ export async function POST(req: Request) {
     ? await explain(ranked[0].chips, pool ? { name: pool.name, current_participants: pool.current_participants, min_participants: pool.min_participants } : null, message)
     : 'Ничего не нашёл — попробуйте переформулировать.';
 
-  return NextResponse.json({ intent, prod
+  return NextResponse.json({ intent, products: ranked, pool, explanation });
+}
