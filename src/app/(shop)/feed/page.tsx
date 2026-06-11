@@ -64,7 +64,10 @@ function FeedInner() {
           <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 mt-2">
             {loading
               ? Array.from({ length: 8 }).map((_, i) => <div key={i} className="border rounded-2xl bg-zinc-50 animate-pulse aspect-[3/4]" />)
-              : visible.map(p => <ProductCard key={p.id} p={p} />)}
+              : visible.map(p => (
+                  <ProductCard key={p.id} p={p} pool={poolByProduct.get(p.id)}
+                    liked={ctx.likedIds.has(p.id)} onToggleLike={() => onToggleLike(p.id)} />
+                ))}
           </div>
         </main>
       </div>
@@ -74,6 +77,3 @@ function FeedInner() {
   );
 }
 
-export default function Feed() {
-  return <Suspense fallback={<div className="p-6 text-sm text-zinc-400">Загрузка…</div>}><FeedInner /></Suspense>;
-}
