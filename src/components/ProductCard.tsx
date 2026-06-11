@@ -14,12 +14,12 @@ type Props = {
 
 export default function ProductCard({ p, pool = null, liked = false, onToggleLike }: Props) {
   const groupPrice = currentPrice(p.price_kzt, 10);
-  const discountPct = Math.round((1 - groupPrice / p.price_kzt) * 100);
+  const discountPct = p.price_kzt > 0 ? Math.round((1 - groupPrice / p.price_kzt) * 100) : 0;
   return (
     <Link href={`/product/${p.id}`} className="group flex flex-col border rounded-2xl bg-white overflow-hidden hover:border-zinc-300 transition">
       <div className="relative aspect-square bg-zinc-50">
         {p.image_url
-          ? <img src={p.image_url} alt="" loading="lazy" className="w-full h-full object-contain p-3 group-hover:scale-[1.03] transition" />
+          ? <img src={p.image_url} alt={p.title} loading="lazy" className="w-full h-full object-contain p-3 group-hover:scale-[1.03] transition" />
           : <div className="w-full h-full flex items-center justify-center text-3xl text-zinc-200">🛍</div>}
         {onToggleLike && <div className="absolute top-2 right-2"><LikeButton liked={liked} onToggle={onToggleLike} /></div>}
         <span className="absolute bottom-2 left-2 text-[11px] font-semibold bg-emerald-600 text-white rounded-full px-2 py-0.5">−{discountPct}% в группе</span>
