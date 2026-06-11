@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import Icon from './Icon';
 
 export default function FriendNudge() {
   const [nudge, setNudge] = useState<{ poolName: string; productId: string; count: number } | null>(null);
@@ -29,7 +30,7 @@ export default function FriendNudge() {
   return (
     <Link href={`/product/${nudge.productId}`}
       className="block border border-amber-300 bg-amber-50 rounded-2xl p-3.5 text-sm mb-1">
-      👥 {nudge.count} {nudge.count === 1 ? 'друг' : nudge.count < 5 ? 'друга' : 'друзей'} уже в группе «{nudge.poolName}» — присоединяйтесь →
+      <Icon name="users" size={16} className="inline -mt-0.5 mr-1 text-amber-700" /> {nudge.count} {nudge.count === 1 ? 'друг' : nudge.count < 5 ? 'друга' : 'друзей'} уже в группе «{nudge.poolName}» — присоединяйтесь →
     </Link>
   );
 }

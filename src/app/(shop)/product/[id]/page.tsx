@@ -6,6 +6,7 @@ import { formatKzt } from '@/lib/currency';
 import { ladderFor, currentPrice, savings, nextUnlock } from '@/lib/ladder';
 import PoolProgress from '@/components/PoolProgress';
 import FriendAvatars from '@/components/FriendAvatars';
+import Icon from '@/components/Icon';
 
 function ProductInner() {
   const { id } = useParams<{ id: string }>();
@@ -98,7 +99,7 @@ function ProductInner() {
                   const u = JSON.parse(localStorage.getItem('qos_user') ?? 'null');
                   navigator.clipboard.writeText(`${location.origin}/product/${id}?invite=${u?.id ?? ''}`).catch(() => {});
                 }} className="bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-2xl p-3 text-sm w-full">
-                  ✅ Слот зарезервирован! Нажмите, чтобы скопировать ссылку-приглашение для друзей
+                  <span className="flex items-center gap-2"><Icon name="check-circle" size={17} className="shrink-0" />Слот зарезервирован! Нажмите, чтобы скопировать ссылку-приглашение для друзей</span>
                 </button>}
             {state === 'error' && <p className="text-red-500 text-sm">{errText}</p>}
           </div>
@@ -107,9 +108,9 @@ function ProductInner() {
         {pool && expired && (
           <div className="border border-red-200 bg-red-50 rounded-2xl p-4 flex flex-col gap-2">
             <p className="font-semibold text-sm text-red-700">Группа не собралась: {pool.current_participants}/{pool.min_participants} за 24 ч</p>
-            <button className="border border-red-300 rounded-xl py-3 text-sm bg-white">↩️ Вернуть средства (автоматически)</button>
-            <button className="border rounded-xl py-3 text-sm bg-white">⬆️ Доплатить до тира «от 5»: {formatKzt(currentPrice(p.price_kzt, 5))}</button>
-            <button className="border rounded-xl py-3 text-sm bg-white">📤 Расшарить ссылку: +2 часа таймера</button>
+            <button className="border border-red-300 rounded-xl py-3 text-sm bg-white flex items-center justify-center gap-2"><Icon name="undo" size={16} />Вернуть средства (автоматически)</button>
+            <button className="border rounded-xl py-3 text-sm bg-white flex items-center justify-center gap-2"><Icon name="arrow-up" size={16} />Доплатить до тира «от 5»: {formatKzt(currentPrice(p.price_kzt, 5))}</button>
+            <button className="border rounded-xl py-3 text-sm bg-white flex items-center justify-center gap-2"><Icon name="share" size={16} />Расшарить ссылку: +2 часа таймера</button>
           </div>
         )}
       </div>

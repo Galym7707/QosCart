@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import TrustBadge from '@/components/TrustBadge';
 import { parentLabel, LEGACY_MAP } from '@/lib/categories';
+import Icon from '@/components/Icon';
 
 type Friend = { id: string; name: string; city: string };
 
@@ -66,7 +67,7 @@ export default function Profile() {
         <p className="text-xs text-zinc-500 mt-3">
           Интересы: {(user.interests ?? []).map((i: string) => parentLabel(LEGACY_MAP[i] ?? i)).join(', ') || '—'} · Бюджет: {user.budget_kzt?.toLocaleString('ru-RU') ?? '—'} ₸ · {user.city}
         </p>
-        <Link href="/feed?liked=1" className="inline-block mt-3 text-xs border rounded-full px-3 py-1.5">♥ Моё избранное</Link>
+        <Link href="/feed?liked=1" className="inline-block mt-3 text-xs border rounded-full px-3 py-1.5"><span className="inline-flex items-center gap-1.5"><Icon name="heart" size={13} />Моё избранное</span></Link>
       </section>
 
       <section className="border rounded-2xl p-4">

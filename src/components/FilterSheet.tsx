@@ -2,6 +2,7 @@
 'use client';
 import FilterPanel from './FilterPanel';
 import type { FilterState } from '@/lib/filters';
+import Icon from './Icon';
 
 export default function FilterSheet({ open, onClose, f, onChange }:
   { open: boolean; onClose: () => void; f: FilterState; onChange: (f: FilterState) => void }) {
@@ -12,7 +13,7 @@ export default function FilterSheet({ open, onClose, f, onChange }:
       <div className="absolute bottom-0 inset-x-0 bg-white rounded-t-3xl p-5 max-h-[80vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
           <p className="font-bold">Фильтры</p>
-          <button aria-label="Закрыть" onClick={onClose} className="w-9 h-9 rounded-full bg-zinc-100">✕</button>
+          <button aria-label="Закрыть" onClick={onClose} className="w-9 h-9 rounded-full bg-zinc-100 flex items-center justify-center"><Icon name="x" size={16} /></button>
         </div>
         <FilterPanel f={f} onChange={onChange} />
         <button onClick={onClose} className="w-full bg-zinc-900 text-white rounded-2xl py-3.5 mt-5 font-semibold">Показать</button>

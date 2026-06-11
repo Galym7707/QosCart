@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 import { CATEGORIES } from '@/lib/categories';
+import Icon from '@/components/Icon';
 
 const INTERESTS = CATEGORIES.map(c => ({ slug: c.slug, ru: c.ru }));
 
@@ -65,14 +66,14 @@ export default function Onboarding() {
       {err && <p className="text-red-500 text-sm">{err}</p>}
       <button disabled={busy} onClick={checkCode} className="bg-black text-white rounded-2xl py-4 disabled:opacity-40">{busy ? 'Проверяю…' : 'Подтвердить'}</button>
       <div className="mt-4 border border-emerald-300 bg-emerald-50 rounded-2xl p-4 text-sm text-emerald-800">
-        🛡 Trust Passport: телефон будет привязан к устройству. Уровень 2 — верификация через SIM/eSIM ID оператора.
+        <Icon name="shield" size={15} className="inline -mt-0.5 mr-1" /> Trust Passport: телефон будет привязан к устройству. Уровень 2 — верификация через SIM/eSIM ID оператора.
       </div>
     </div>
   );
 
   return (
     <div className="mx-auto max-w-md p-6 flex flex-col gap-4">
-      <div className="mt-4 border border-emerald-300 bg-emerald-50 rounded-2xl p-3 text-sm text-emerald-800">✅ Пользователь подтверждён через SIM/eSIM ID · устройство привязано</div>
+      <div className="mt-4 border border-emerald-300 bg-emerald-50 rounded-2xl p-3 text-sm text-emerald-800"><span className="flex items-center gap-1.5"><Icon name="check-circle" size={16} className="shrink-0" />Пользователь подтверждён через SIM/eSIM ID · устройство привязано</span></div>
       <h2 className="text-xl font-bold">Интересы и бюджет</h2>
       <div className="flex flex-wrap gap-2">
         {INTERESTS.map(i => (

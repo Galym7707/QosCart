@@ -1,7 +1,7 @@
 // src/hooks/useVoice.ts
 'use client';
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { pickVoice } from '@/lib/voice';
+import { pickVoice, cleanSpeechText } from '@/lib/voice';
 
 export function useVoice(onFinal: (text: string) => void) {
   const [supported, setSupported] = useState(false);
@@ -48,9 +48,13 @@ export function useVoice(onFinal: (text: string) => void) {
 
   const speak = useCallback((text: string) => {
     if (!ttsOn || !window.speechSynthesis) return;
+    const clean = cleanSpeechText(text);
+    if (!clean) return;
     window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
+    const u = new SpeechSynthesisUtterance(clean);
     u.lang = 'ru-RU';
+    u.rate = 1.05;   // чуть живее монотонных системных голосов
+    u.pitch = 1.03;
     const voices = window.speechSynthesis.getVoices();
     const i = pickVoice(voices.map(v => ({ lang: v.lang, name: v.name })));
     if (i !== -1) u.voice = voices[i];
