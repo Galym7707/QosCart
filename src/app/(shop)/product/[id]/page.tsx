@@ -1,17 +1,21 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useEffect, useState, Suspense } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { formatKzt } from '@/lib/currency';
 import { ladderFor, currentPrice, savings, nextUnlock } from '@/lib/ladder';
 import PoolProgress from '@/components/PoolProgress';
+import FriendAvatars from '@/components/FriendAvatars';
 
-export default function Product() {
+function ProductInner() {
   const { id } = useParams<{ id: string }>();
   const [p, setP] = useState<any>(null);
   const [pool, setPool] = useState<any>(null);
   const [state, setState] = useState<'idle' | 'joined' | 'error'>('idle');
   const [errText, setErrText] = useState('');
+  const sp = useSearchParams();
+  const inviterId = sp.get('invite');
+  const [friendNames, setFriendNames] = useState<string[]>([]);
 
   useEffect(() => {
     supabase.from('products').select('*').eq('id', id).single().then(({ data }) => setP(data));
@@ -29,6 +33,18 @@ export default function Product() {
     return () => { supabase.removeChannel(ch); };
   }, [pool?.id]);
 
+  useEffect(() => {
+    if (!pool?.id) return;
+    const u = JSON.parse(localStorage.getItem('qos_user') ?? 'null');
+    if (!u?.id) return;
+    (async () => {
+      const fRes = await fetch(`/api/friends?userId=${u.id}`).then(r => r.json()).catch(() => ({ friends: [] }));
+      const friendById = new Map((fRes.friends ?? []).map((f: any) => [f.id, f.name]));
+      const { data: members } = await supabase.from('pool_members').select('user_id').eq('pool_id', pool.id);
+      setFriendNames(((members ?? []).map(m => friendById.get(m.user_id)).filter(Boolean)) as string[]);
+    })();
+  }, [pool?.id]);
+
   if (!p) return <div className="p-6">Загрузка…</div>;
   const expired = pool && (pool.status === 'expired' || new Date(pool.expires_at) <= new Date());
   const n = pool?.current_participants ?? 0;
@@ -37,7 +53,7 @@ export default function Product() {
   async function join() {
     const u = JSON.parse(localStorage.getItem('qos_user') ?? 'null');
     if (!u) { setErrText('Сначала пройдите регистрацию'); setState('error'); return; }
-    const res = await fetch('/api/pools/join', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ poolId: pool.id, userId: u.id }) });
+    const res = await fetch('/api/pools/join', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ poolId: pool.id, userId: u.id, inviterId }) });
     if (res.ok) { setState('joined'); }
     else { const { error } = await res.json(); setErrText({ expired: 'Группа истекла', duplicate: 'Вы уже в группе (1 устройство = 1 слот)', not_verified: 'Нужна верификация', closed: 'Группа закрыта', not_found: 'Группа недоступна' }[error as string] ?? error); setState('error'); }
   }
@@ -67,12 +83,23 @@ export default function Product() {
         {pool && !expired && (
           <div className="border rounded-2xl p-4 flex flex-col gap-3">
             <p className="font-semibold text-sm">{pool.name}</p>
+            {friendNames.length > 0 && (
+              <div className="flex items-center gap-2 text-xs text-emerald-700">
+                <FriendAvatars names={friendNames} />
+                {friendNames.length === 1 ? `${friendNames[0]} уже в группе` : `${friendNames.length} друзей уже в группе`}
+              </div>
+            )}
             <PoolProgress pool={pool} />
             <p className="text-sm">Сейчас: <b className="text-emerald-600">{formatKzt(currentPrice(p.price_kzt, n))}</b> · экономия {formatKzt(savings(p.price_kzt, Math.max(n, 10)))} при 10+
               {unlock && <span className="text-zinc-500"> · ещё {unlock.needed} чел до {formatKzt(unlock.price)}</span>}</p>
             {state !== 'joined'
               ? <button onClick={join} className="bg-black text-white rounded-2xl py-4 font-semibold">Присоединиться к группе</button>
-              : <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-2xl p-3 text-sm">✅ Слот зарезервирован! Позовите друга — ссылка скопирована.</div>}
+              : <button onClick={() => {
+                  const u = JSON.parse(localStorage.getItem('qos_user') ?? 'null');
+                  navigator.clipboard.writeText(`${location.origin}/product/${id}?invite=${u?.id ?? ''}`).catch(() => {});
+                }} className="bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-2xl p-3 text-sm w-full">
+                  ✅ Слот зарезервирован! Нажмите, чтобы скопировать ссылку-приглашение для друзей
+                </button>}
             {state === 'error' && <p className="text-red-500 text-sm">{errText}</p>}
           </div>
         )}
@@ -88,4 +115,8 @@ export default function Product() {
       </div>
     </div>
   );
+}
+
+export default function Product() {
+  return <Suspense fallback={<div className="p-6">Загрузка…</div>}><ProductInner /></Suspense>;
 }
