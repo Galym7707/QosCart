@@ -26,7 +26,7 @@ export default function Chat() {
         {msgs.map((m, i) => (
           <div key={i} className={m.role === 'user' ? 'self-end bg-black text-white rounded-2xl px-4 py-2 max-w-[80%]' : 'self-start w-full'}>
             {m.text && <p className={m.role === 'agent' ? 'bg-zinc-100 rounded-2xl px-4 py-2 text-sm' : 'text-sm'}>{m.text}</p>}
-            {m.products && <div className="flex flex-col gap-2 mt-2">{m.products.map(p => <ProductCard key={p.id} p={p} participants={m.pool?.current_participants ?? 0} />)}</div>}
+            {m.products && <div className="flex flex-col gap-2 mt-2">{m.products.map(p => <ProductCard key={p.id} p={p} pool={m.pool ?? null} />)}</div>}
             {m.pool && <Link href={`/product/${m.pool.product_id}`} className="block mt-2 border border-amber-300 bg-amber-50 rounded-2xl p-3 text-sm">🔥 {m.pool.name}: {m.pool.current_participants}/{m.pool.min_participants} — нужно ещё {m.pool.min_participants - m.pool.current_participants} →</Link>}
           </div>
         ))}
