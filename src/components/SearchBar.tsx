@@ -8,7 +8,7 @@ export default function SearchBar({ value, onChange, className = '' }: { value: 
   useEffect(() => {
     const t = setTimeout(() => { if (local !== value) onChange(local); }, 200);
     return () => clearTimeout(t);
-  }, [local]);
+  }, [local, value, onChange]);
   return (
     <div className={`relative ${className}`}>
       <input

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 export default function AgentDock({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   useEffect(() => { setOpen(localStorage.getItem('qos_dock') !== '0'); }, []);
   const toggle = () => setOpen(o => { localStorage.setItem('qos_dock', o ? '0' : '1'); return !o; });
   return (

@@ -31,7 +31,7 @@ export default function Chat() {
           </div>
         ))}
       </div>
-      <div className="fixed bottom-0 w-full max-w-[390px] p-3 bg-white border-t flex gap-2">
+      <div className="fixed bottom-0 inset-x-0 max-w-2xl mx-auto p-3 bg-white border-t flex gap-2">
         <input className="flex-1 border rounded-full px-4 py-3 text-sm" value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()} placeholder="Что хотите купить?" />
         <button onClick={send} disabled={busy} className="bg-black text-white rounded-full px-5 disabled:opacity-40">→</button>
       </div>
