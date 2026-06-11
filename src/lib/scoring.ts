@@ -3,38 +3,42 @@ import { formatKzt } from './currency';
 
 export type ScoreInputProduct = { category: string; price_kzt: number; rating?: number | null };
 export type Profile = { interests: string[]; budget_kzt?: number | null; city: string };
-export type ScoreCtx = { cityDemand?: boolean; poolProgress?: number; trustShare?: number };
+export type ScoreCtx = {
+  cityDemand?: boolean; poolProgress?: number; trustShare?: number;
+  likedCategory?: boolean; friendsInPool?: number;
+};
 export type Chip = { label: string; hit: boolean };
+export type Factor = { key: string; label: string; points: number; max: number };
 
-export function scoreProduct(p: ScoreInputProduct, u: Profile, ctx: ScoreCtx): { score: number; chips: Chip[] } {
-  let score = 0;
+export function scoreProduct(p: ScoreInputProduct, u: Profile, ctx: ScoreCtx): { score: number; chips: Chip[]; factors: Factor[] } {
+  const factors: Factor[] = [];
   const chips: Chip[] = [];
+  const add = (key: string, label: string, points: number, max: number, chipLabel: string) => {
+    factors.push({ key, label, points, max });
+    chips.push({ label: chipLabel, hit: points > 0 });
+  };
 
   const interestHit = u.interests.includes(p.category);
-  if (interestHit) score += 25;
-  chips.push({ label: `Интерес: ${p.category}`, hit: interestHit });
+  add('interest', 'Совпадение интересов', interestHit ? 20 : 0, 20, `Интерес: ${p.category}`);
 
   let budgetPts = 0;
   if (u.budget_kzt) {
-    if (p.price_kzt <= u.budget_kzt) budgetPts = 20;
-    else if (p.price_kzt <= u.budget_kzt * 1.2) budgetPts = 10;
+    if (p.price_kzt <= u.budget_kzt) budgetPts = 18;
+    else if (p.price_kzt <= u.budget_kzt * 1.2) budgetPts = 9;
   }
-  score += budgetPts;
-  chips.push({ label: `Бюджет: до ${formatKzt(u.budget_kzt ?? 0)}`, hit: budgetPts > 0 });
+  add('budget', 'Попадание в бюджет', budgetPts, 18, `Бюджет: до ${formatKzt(u.budget_kzt ?? 0)}`);
 
-  if (ctx.cityDemand) score += 15;
-  chips.push({ label: `Спрос в ${u.city}`, hit: !!ctx.cityDemand });
+  add('city', 'Спрос в городе', ctx.cityDemand ? 12 : 0, 12, `Спрос в ${u.city}`);
 
   let q = 0;
-  if (p.rating != null) q = p.rating >= 4.5 ? 20 : p.rating >= 4 ? 15 : p.rating >= 3.5 ? 10 : 5;
-  score += q;
-  chips.push({ label: `Рейтинг ${p.rating ?? '—'}`, hit: q >= 15 });
+  if (p.rating != null) q = p.rating >= 4.5 ? 18 : p.rating >= 4 ? 14 : p.rating >= 3.5 ? 9 : 4;
+  add('quality', 'Качество (рейтинг)', q, 18, `Рейтинг ${p.rating ?? '—'}`);
 
-  if ((ctx.poolProgress ?? 0) >= 0.7) score += 10;
-  chips.push({ label: 'Группа почти собрана', hit: (ctx.poolProgress ?? 0) >= 0.7 });
+  add('momentum', 'Группа почти собрана', (ctx.poolProgress ?? 0) >= 0.7 ? 8 : 0, 8, 'Группа почти собрана');
+  add('trust', 'Верификация участников', (ctx.trustShare ?? 0) >= 0.8 ? 8 : 0, 8, 'Участники верифицированы');
+  add('liked', 'Похоже на ваши лайки', ctx.likedCategory ? 8 : 0, 8, `Вы лайкали: ${p.category}`);
+  add('friends', 'Друзья в группе', (ctx.friendsInPool ?? 0) >= 1 ? 8 : 0, 8, `Друзья в группе: ${ctx.friendsInPool ?? 0}`);
 
-  if ((ctx.trustShare ?? 0) >= 0.8) score += 10;
-  chips.push({ label: 'Участники верифицированы', hit: (ctx.trustShare ?? 0) >= 0.8 });
-
-  return { score, chips };
+  const score = factors.reduce((s, f) => s + f.points, 0);
+  return { score, chips, factors };
 }

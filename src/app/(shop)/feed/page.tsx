@@ -26,10 +26,12 @@ function FeedInner() {
 
   const visible = useMemo(() => {
     const prof = { interests: user?.interests ?? [], budget_kzt: user?.budget_kzt, city: user?.city ?? 'Almaty' };
+    const likedCats = new Set(products.filter(x => ctx.likedIds.has(x.id)).map(x => x.category));
     const scored = products.map(p => ({
       ...p,
       ...scoreProduct(p, prof, {
         poolProgress: (ctx.poolParticipants.get(p.id) ?? 0) / 10,
+        likedCategory: likedCats.has(p.category),
       }),
     }));
     return applySort(applyFilters(scored, filters, ctx), sort, ctx);
@@ -57,7 +59,7 @@ function FeedInner() {
           {!loading && visible.length === 0 && (
             <div className="text-center py-16 text-sm text-zinc-500">
               Ничего не нашлось.
-              <Link href="/chat" className="block mt-3 underline">Спросить AI-агента →</Link>
+              <Link href="/chat" className="block mt-3 underline">Спросить AI-агента</Link>
             </div>
           )}
 
@@ -77,3 +79,6 @@ function FeedInner() {
   );
 }
 
+export default function Feed() {
+  return <Suspense fallback={<div className="p-6 text-sm text-zinc-400">Загрузка…</div>}><FeedInner /></Suspense>;
+}
