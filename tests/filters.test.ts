@@ -58,6 +58,11 @@ describe('URL state', () => {
     expect(back.filters).toEqual(f);
     expect(back.sort).toBe('price_asc');
   });
+  it('мусорные параметры: min=abc → null (не NaN), sort=evil → relevance', () => {
+    const back = filtersFromParams(new URLSearchParams('min=abc&sort=evil'));
+    expect(back.filters.min).toBeNull();
+    expect(back.sort).toBe('relevance');
+  });
   it('дефолты не попадают в строку, пустая строка → дефолты', () => {
     expect(paramsFromFilters(DEFAULT_FILTERS, 'relevance')).toBe('');
     const back = filtersFromParams(new URLSearchParams(''));

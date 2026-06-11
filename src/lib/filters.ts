@@ -43,17 +43,21 @@ export function applySort<T extends ProductLike>(items: T[], key: SortKey, ctx: 
     case 'price_desc': return a.sort((x, y) => y.price_kzt - x.price_kzt);
     case 'rating':     return a.sort((x, y) => (y.rating ?? 0) - (x.rating ?? 0));
     case 'popularity': return a.sort((x, y) => (y.reviews_count ?? 0) - (x.reviews_count ?? 0));
-    case 'newest':     return a.sort((x, y) => Date.parse(y.fetched_at) - Date.parse(x.fetched_at));
+    case 'newest':     return a.sort((x, y) => (Date.parse(y.fetched_at) || 0) - (Date.parse(x.fetched_at) || 0));
     case 'savings':    return a.sort((x, y) => savingsNow(y) - savingsNow(x));
     case 'relevance':
     default:           return a.sort((x, y) => (y.score ?? 0) - (x.score ?? 0));
   }
 }
 
-const SORT_KEYS: SortKey[] = ['relevance', 'price_asc', 'price_desc', 'rating', 'savings', 'popularity', 'newest'];
+const SORT_KEYS = Object.keys(SORT_LABELS) as SortKey[];
 
 export function filtersFromParams(sp: URLSearchParams): { filters: FilterState; sort: SortKey } {
-  const num = (k: string) => (sp.has(k) && sp.get(k) !== '' ? Number(sp.get(k)) : null);
+  const num = (k: string) => {
+    if (!sp.has(k) || sp.get(k) === '') return null;
+    const v = Number(sp.get(k));
+    return Number.isNaN(v) ? null : v;
+  };
   const sort = (sp.get('sort') as SortKey) ?? 'relevance';
   return {
     filters: {
