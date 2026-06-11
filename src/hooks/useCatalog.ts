@@ -17,22 +17,27 @@ export function useCatalog() {
   const [poolParticipants, setPoolParticipants] = useState<Map<string, number>>(new Map());
   const [poolByProduct, setPoolByProduct] = useState<Map<string, any>>(new Map());
   const [loading, setLoading] = useState(true);
-  const user = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('qos_user') ?? 'null') : null;
+  const [user] = useState(() =>
+    typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('qos_user') ?? 'null') : null
+  );
 
   useEffect(() => {
     (async () => {
-      const [{ data: prods }, { data: pools }, liked] = await Promise.all([
-        supabase.from('products')
-          .select('id,title,category,subcategory,price_kzt,rating,reviews_count,image_url,source,fetched_at')
-          .limit(2000),
-        supabase.from('pools').select('*').eq('status', 'forming').gt('expires_at', new Date().toISOString()),
-        user?.id ? fetchLikedIds(user.id) : Promise.resolve(new Set<string>()),
-      ]);
-      setProducts(prods ?? []);
-      setLikedIds(liked);
-      setPoolParticipants(new Map((pools ?? []).map(p => [p.product_id, p.current_participants])));
-      setPoolByProduct(new Map((pools ?? []).map(p => [p.product_id, p])));
-      setLoading(false);
+      try {
+        const [{ data: prods }, { data: pools }, liked] = await Promise.all([
+          supabase.from('products')
+            .select('id,title,category,subcategory,price_kzt,rating,reviews_count,image_url,source,fetched_at')
+            .limit(2000),
+          supabase.from('pools').select('*').eq('status', 'forming').gt('expires_at', new Date().toISOString()),
+          user?.id ? fetchLikedIds(user.id) : Promise.resolve(new Set<string>()),
+        ]);
+        setProducts(prods ?? []);
+        setLikedIds(liked);
+        setPoolParticipants(new Map((pools ?? []).map(p => [p.product_id, p.current_participants])));
+        setPoolByProduct(new Map((pools ?? []).map(p => [p.product_id, p])));
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
