@@ -47,7 +47,7 @@ export default function Onboarding() {
   }
 
   if (step === 'form') return (
-    <div className="p-6 flex flex-col gap-4">
+    <div className="mx-auto max-w-md p-6 flex flex-col gap-4">
       <h2 className="text-xl font-bold pt-8">Регистрация</h2>
       <input className="border rounded-xl p-4" placeholder="Имя" value={name} onChange={e => setName(e.target.value)} />
       <input className="border rounded-xl p-4" placeholder="+7 ___ ___ __ __" value={phone} onChange={e => setPhone(e.target.value)} />
@@ -56,7 +56,7 @@ export default function Onboarding() {
   );
 
   if (step === 'otp') return (
-    <div className="p-6 flex flex-col gap-4">
+    <div className="mx-auto max-w-md p-6 flex flex-col gap-4">
       <h2 className="text-xl font-bold pt-8">Подтверждение SIM</h2>
       <p className="text-sm text-zinc-500">{otpMode === 'sms' ? `Мы отправили SMS-код на ${phone}` : `SMS недоступно для ${phone} — введите демо-код`}</p>
       <input className="border rounded-xl p-4 text-center text-2xl tracking-[0.5em]" maxLength={6} value={code} onChange={e => setCode(e.target.value)} />
@@ -69,7 +69,7 @@ export default function Onboarding() {
   );
 
   return (
-    <div className="p-6 flex flex-col gap-4">
+    <div className="mx-auto max-w-md p-6 flex flex-col gap-4">
       <div className="mt-4 border border-emerald-300 bg-emerald-50 rounded-2xl p-3 text-sm text-emerald-800">✅ Пользователь подтверждён через SIM/eSIM ID · устройство привязано</div>
       <h2 className="text-xl font-bold">Интересы и бюджет</h2>
       <div className="flex flex-wrap gap-2">

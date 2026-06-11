@@ -43,42 +43,49 @@ export default function Product() {
   }
 
   return (
-    <div className="p-4 pb-28 flex flex-col gap-4">
-      {p.image_url && <img src={p.image_url} alt="" className="w-full h-56 object-contain bg-zinc-50 rounded-2xl" />}
+    <div className="mx-auto max-w-5xl px-4 pb-28 lg:pb-10 pt-4 grid lg:grid-cols-2 gap-6 items-start">
       <div>
-        <h1 className="font-bold">{p.title}</h1>
-        <p className="text-xs text-zinc-400">{p.source} · цена обновлена {new Date(p.fetched_at).toLocaleString('ru-RU')} · estimated</p>
+        {p.image_url
+          ? <img src={p.image_url} alt={p.title} className="w-full aspect-square object-contain bg-zinc-50 rounded-3xl" />
+          : <div className="w-full aspect-square bg-zinc-50 rounded-3xl" />}
       </div>
 
-      <div className="border rounded-2xl divide-y">
-        {ladderFor(p.price_kzt).map(t => (
-          <div key={t.threshold} className={`flex justify-between p-3 text-sm ${n >= t.threshold ? 'bg-emerald-50' : ''}`}>
-            <span>{t.label} · от {t.threshold}</span><b>{formatKzt(t.price)}</b>
+      <div className="flex flex-col gap-4">
+        <div>
+          <h1 className="font-bold text-lg lg:text-2xl">{p.title}</h1>
+          <p className="text-xs text-zinc-400 mt-1">{p.source} · цена обновлена {new Date(p.fetched_at).toLocaleString('ru-RU')} · estimated</p>
+        </div>
+
+        <div className="border rounded-2xl divide-y">
+          {ladderFor(p.price_kzt).map(t => (
+            <div key={t.threshold} className={`flex justify-between p-3 text-sm ${n >= t.threshold ? 'bg-emerald-50' : ''}`}>
+              <span>{t.label} · от {t.threshold}</span><b>{formatKzt(t.price)}</b>
+            </div>
+          ))}
+        </div>
+
+        {pool && !expired && (
+          <div className="border rounded-2xl p-4 flex flex-col gap-3">
+            <p className="font-semibold text-sm">{pool.name}</p>
+            <PoolProgress pool={pool} />
+            <p className="text-sm">Сейчас: <b className="text-emerald-600">{formatKzt(currentPrice(p.price_kzt, n))}</b> · экономия {formatKzt(savings(p.price_kzt, Math.max(n, 10)))} при 10+
+              {unlock && <span className="text-zinc-500"> · ещё {unlock.needed} чел до {formatKzt(unlock.price)}</span>}</p>
+            {state !== 'joined'
+              ? <button onClick={join} className="bg-black text-white rounded-2xl py-4 font-semibold">Присоединиться к группе</button>
+              : <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-2xl p-3 text-sm">Слот зарезервирован! Позовите друга — ссылка скопирована.</div>}
+            {state === 'error' && <p className="text-red-500 text-sm">{errText}</p>}
           </div>
-        ))}
+        )}
+
+        {pool && expired && (
+          <div className="border border-red-200 bg-red-50 rounded-2xl p-4 flex flex-col gap-2">
+            <p className="font-semibold text-sm text-red-700">Группа не собралась: {pool.current_participants}/{pool.min_participants} за 24 ч</p>
+            <button className="border border-red-300 rounded-xl py-3 text-sm bg-white">Вернуть средства (автоматически)</button>
+            <button className="border rounded-xl py-3 text-sm bg-white">Доплатить до тира «от 5»: {formatKzt(currentPrice(p.price_kzt, 5))}</button>
+            <button className="border rounded-xl py-3 text-sm bg-white">Расшарить ссылку: +2 часа таймера</button>
+          </div>
+        )}
       </div>
-
-      {pool && !expired && (
-        <div className="border rounded-2xl p-4 flex flex-col gap-3">
-          <p className="font-semibold text-sm">{pool.name}</p>
-          <PoolProgress pool={pool} />
-          <p className="text-sm">Сейчас: <b className="text-emerald-600">{formatKzt(currentPrice(p.price_kzt, n))}</b> · экономия {formatKzt(savings(p.price_kzt, Math.max(n, 10)))} при 10+
-            {unlock && <span className="text-zinc-500"> · ещё {unlock.needed} чел до {formatKzt(unlock.price)}</span>}</p>
-          {state !== 'joined'
-            ? <button onClick={join} className="bg-black text-white rounded-2xl py-4 font-semibold">Присоединиться к группе</button>
-            : <div className="bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-2xl p-3 text-sm">✅ Слот зарезервирован! Позовите друга — ссылка скопирована.</div>}
-          {state === 'error' && <p className="text-red-500 text-sm">{errText}</p>}
-        </div>
-      )}
-
-      {pool && expired && (
-        <div className="border border-red-200 bg-red-50 rounded-2xl p-4 flex flex-col gap-2">
-          <p className="font-semibold text-sm text-red-700">Группа не собралась: {pool.current_participants}/{pool.min_participants} за 24 ч</p>
-          <button className="border border-red-300 rounded-xl py-3 text-sm bg-white">↩️ Вернуть средства (автоматически)</button>
-          <button className="border rounded-xl py-3 text-sm bg-white">⬆️ Доплатить до тира «от 5»: {formatKzt(currentPrice(p.price_kzt, 5))}</button>
-          <button className="border rounded-xl py-3 text-sm bg-white">📤 Расшарить ссылку: +2 часа таймера</button>
-        </div>
-      )}
     </div>
   );
 }
