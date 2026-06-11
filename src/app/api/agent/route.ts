@@ -66,6 +66,7 @@ async function runPipeline(message: string, profile: any, emit: (text: string) =
       ...scoreProduct(p, prof, {
         cityDemand: !!pool,
         poolProgress: pool ? pool.current_participants / pool.min_participants : 0,
+        trustShare: pool ? 1 : 0,  // участники пулов верифицированы by design (canJoin)
         likedCategory: likedCats.has(p.category),
         friendsInPool,
       }),

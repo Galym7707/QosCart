@@ -3,7 +3,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
-const INTERESTS = ['tech', 'study', 'home', 'fashion', 'sport', 'beauty'];
+import { CATEGORIES } from '@/lib/categories';
+
+const INTERESTS = CATEGORIES.map(c => ({ slug: c.slug, ru: c.ru }));
 
 export default function Onboarding() {
   const r = useRouter();
@@ -74,8 +76,8 @@ export default function Onboarding() {
       <h2 className="text-xl font-bold">Интересы и бюджет</h2>
       <div className="flex flex-wrap gap-2">
         {INTERESTS.map(i => (
-          <button key={i} onClick={() => setSel(s => s.includes(i) ? s.filter(x => x !== i) : [...s, i])}
-            className={`px-4 py-2 rounded-full border ${sel.includes(i) ? 'bg-black text-white' : 'bg-white'}`}>{i}</button>
+          <button key={i.slug} onClick={() => setSel(s => s.includes(i.slug) ? s.filter(x => x !== i.slug) : [...s, i.slug])}
+            className={`px-4 py-2 rounded-full border text-sm ${sel.includes(i.slug) ? 'bg-black text-white' : 'bg-white'}`}>{i.ru}</button>
         ))}
       </div>
       <label className="text-sm text-zinc-500">Бюджет: {budget.toLocaleString('ru-RU')} ₸</label>

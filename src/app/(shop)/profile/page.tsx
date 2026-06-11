@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import TrustBadge from '@/components/TrustBadge';
-import { parentLabel } from '@/lib/categories';
+import { parentLabel, LEGACY_MAP } from '@/lib/categories';
 
 type Friend = { id: string; name: string; city: string };
 
@@ -64,7 +64,7 @@ export default function Profile() {
           </div>
         </div>
         <p className="text-xs text-zinc-500 mt-3">
-          Интересы: {(user.interests ?? []).map((i: string) => parentLabel(i)).join(', ') || '—'} · Бюджет: {user.budget_kzt?.toLocaleString('ru-RU') ?? '—'} ₸ · {user.city}
+          Интересы: {(user.interests ?? []).map((i: string) => parentLabel(LEGACY_MAP[i] ?? i)).join(', ') || '—'} · Бюджет: {user.budget_kzt?.toLocaleString('ru-RU') ?? '—'} ₸ · {user.city}
         </p>
         <Link href="/feed?liked=1" className="inline-block mt-3 text-xs border rounded-full px-3 py-1.5">♥ Моё избранное</Link>
       </section>
