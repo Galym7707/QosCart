@@ -29,7 +29,7 @@ export default function FriendNudge() {
   return (
     <Link href={`/product/${nudge.productId}`}
       className="block border border-amber-300 bg-amber-50 rounded-2xl p-3.5 text-sm mb-1">
-      👥 {nudge.count} {nudge.count === 1 ? 'друг' : 'друзей'} уже в группе «{nudge.poolName}» — присоединяйтесь →
+      👥 {nudge.count} {nudge.count === 1 ? 'друг' : nudge.count < 5 ? 'друга' : 'друзей'} уже в группе «{nudge.poolName}» — присоединяйтесь →
     </Link>
   );
 }

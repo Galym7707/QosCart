@@ -36,6 +36,7 @@ export default function AgentPanel({ fullScreen = false }: { fullScreen?: boolea
     setMsgs(m => [...m, { role: 'user', text: message, done: true }, { role: 'agent', steps: [] }]);
     setInput(''); setBusy(true);
     try {
+      try {
       const res = await fetch('/api/agent', {
         method: 'POST', headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ message, profile, stream: true }),
@@ -47,7 +48,7 @@ export default function AgentPanel({ fullScreen = false }: { fullScreen?: boolea
       let steps: Step[] = [];
       for (;;) {
         const { value, done } = await reader.read();
-        if (done) break;
+        if (done) { buf += dec.decode(); break; }
         buf += dec.decode(value, { stream: true });
         const { events, rest } = splitSseEvents(buf);
         buf = rest;
@@ -61,15 +62,19 @@ export default function AgentPanel({ fullScreen = false }: { fullScreen?: boolea
           }
         }
       }
+      } catch {
+        const res = await fetch('/api/agent', {
+          method: 'POST', headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ message, profile }),
+        });
+        const r = await res.json();
+        patchLast({ steps: [], text: r.explanation, products: r.products, pool: r.pool, done: true });
+      }
     } catch {
-      const res = await fetch('/api/agent', {
-        method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ message, profile }),
-      });
-      const r = await res.json();
-      patchLast({ steps: [], text: r.explanation, products: r.products, pool: r.pool, done: true });
+      patchLast({ steps: [], text: 'Агент недоступен — попробуйте ещё раз.', done: true });
+    } finally {
+      setBusy(false);
     }
-    setBusy(false);
   }
 
   async function inviteFriends(pool: any) {
@@ -103,7 +108,7 @@ export default function AgentPanel({ fullScreen = false }: { fullScreen?: boolea
                   <div className="grid grid-cols-2 gap-2">
                     {m.products.map(p => (
                       <div key={p.id} className="flex flex-col gap-1">
-                        <ProductCard p={p} pool={m.pool ?? null} />
+                        <ProductCard p={p} pool={m.pool && m.pool.product_id === p.id ? m.pool : null} />
                         {p.factors && <WhyPanel factors={p.factors} score={p.score} />}
                       </div>
                     ))}
@@ -117,7 +122,7 @@ export default function AgentPanel({ fullScreen = false }: { fullScreen?: boolea
                 {m.done && m.products && (
                   <div className="flex flex-wrap gap-1.5">
                     <button onClick={() => send(`${lastQuery.current} дешевле`)} className="text-xs border rounded-full px-3 py-1.5 bg-white hover:border-zinc-400">Похожие дешевле</button>
-                    <button onClick={() => inviteFriends(m.pool)} className="text-xs border rounded-full px-3 py-1.5 bg-white hover:border-zinc-400">Собрать группу с друзьями</button>
+                    {m.pool && <button onClick={() => inviteFriends(m.pool)} className="text-xs border rounded-full px-3 py-1.5 bg-white hover:border-zinc-400">Собрать группу с друзьями</button>}
                     <button onClick={() => send(`${lastQuery.current} ещё варианты`)} className="text-xs border rounded-full px-3 py-1.5 bg-white hover:border-zinc-400">Показать ещё</button>
                   </div>
                 )}
@@ -128,6 +133,7 @@ export default function AgentPanel({ fullScreen = false }: { fullScreen?: boolea
       </div>
       <div className={`${fullScreen ? 'fixed bottom-16 inset-x-0 lg:bottom-0 max-w-2xl mx-auto' : 'absolute bottom-0 inset-x-0'} p-3 bg-white border-t flex gap-2`}>
         <input
+          aria-label="Сообщение агенту"
           className="flex-1 border rounded-full px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
           value={input} onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && send(input)} placeholder="Что хотите купить?" />
