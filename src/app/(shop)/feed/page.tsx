@@ -11,6 +11,7 @@ import SearchBar from '@/components/SearchBar';
 import SortBar from '@/components/SortBar';
 import FilterPanel from '@/components/FilterPanel';
 import FilterSheet from '@/components/FilterSheet';
+import FriendNudge from '@/components/FriendNudge';
 
 function FeedInner() {
   const router = useRouter();
@@ -49,6 +50,7 @@ function FeedInner() {
         </aside>
 
         <main className="flex-1 min-w-0">
+          <FriendNudge />
           <div className="flex items-center gap-2">
             <div className="flex-1 min-w-0"><SortBar sort={sort} onChange={s => update(filters, s)} /></div>
             <button onClick={() => setSheetOpen(true)}
