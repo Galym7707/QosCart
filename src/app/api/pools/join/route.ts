@@ -23,10 +23,12 @@ export async function POST(req: Request) {
   if (insErr) return NextResponse.json({ error: 'duplicate' }, { status: 409 }); // unique-constraint = второй рубеж
 
   if (inviterId && inviterId !== userId) {
-    await db.from('friendships').upsert([
-      { user_id: userId, friend_id: inviterId, source: 'invite' },
-      { user_id: inviterId, friend_id: userId, source: 'invite' },
-    ], { onConflict: 'user_id,friend_id', ignoreDuplicates: true });
+    try {
+      await db.from('friendships').upsert([
+        { user_id: userId, friend_id: inviterId, source: 'invite' },
+        { user_id: inviterId, friend_id: userId, source: 'invite' },
+      ], { onConflict: 'user_id,friend_id', ignoreDuplicates: true });
+    } catch { /* дружба — побочный эффект, не блокирует join */ }
   }
 
   const next = applyJoin(pool);

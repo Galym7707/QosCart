@@ -37,7 +37,7 @@ export default function Onboarding() {
 
   async function finish() {
     const device_id = crypto.randomUUID();
-    const phone_hash = btoa(phone); // demo-хэш; не хранить открытый номер
+    const phone_hash = btoa(phone.replace(/[^\d+]/g, '')); // demo-хэш; не хранить открытый номер
     const { data, error } = await supabase.from('users').insert({
       name, phone_hash, device_id, city: 'Almaty', interests: sel, budget_kzt: budget, esim_verified: true,
     }).select('id').single();

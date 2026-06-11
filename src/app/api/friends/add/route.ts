@@ -27,7 +27,8 @@ export async function POST(req: Request) {
     const { data } = await db.from('users').select('id, name, city').eq('phone_hash', phoneHash).neq('id', userId).limit(5);
     candidates = data ?? [];
   } else {
-    const { data } = await db.from('users').select('id, name, city').ilike('name', `%${q}%`).neq('id', userId).limit(5);
+    const safe = q.replace(/[%_]/g, '\\$&');
+    const { data } = await db.from('users').select('id, name, city').ilike('name', `%${safe}%`).neq('id', userId).limit(5);
     candidates = data ?? [];
   }
   return NextResponse.json({ candidates });
