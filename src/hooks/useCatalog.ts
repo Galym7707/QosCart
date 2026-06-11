@@ -1,6 +1,6 @@
 // src/hooks/useCatalog.ts — один fetch каталога + активные пулы + лайки
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { fetchLikedIds, toggleLike } from '@/lib/likes';
 import type { CatalogCtx } from '@/lib/filters';
@@ -48,6 +48,6 @@ export function useCatalog() {
     await toggleLike(user.id, productId, was);
   }, [likedIds, user?.id]);
 
-  const ctx: CatalogCtx = { likedIds, poolParticipants };
+  const ctx = useMemo<CatalogCtx>(() => ({ likedIds, poolParticipants }), [likedIds, poolParticipants]);
   return { products, ctx, poolByProduct, loading, onToggleLike, user };
 }

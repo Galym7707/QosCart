@@ -36,11 +36,11 @@ export default function FilterPanel({ f, onChange }: { f: FilterState; onChange:
         <p className="font-semibold mb-2">Цена, ₸</p>
         <div className="flex items-center gap-2">
           <input type="number" inputMode="numeric" placeholder="от" value={f.min ?? ''}
-            onChange={e => set({ min: e.target.value === '' ? null : +e.target.value })}
+            onChange={e => { const v = e.target.value; set({ min: v === '' || Number.isNaN(+v) ? null : +v }); }}
             className="w-full border rounded-xl px-3 py-2" />
           <span className="text-zinc-400">—</span>
           <input type="number" inputMode="numeric" placeholder="до" value={f.max ?? ''}
-            onChange={e => set({ max: e.target.value === '' ? null : +e.target.value })}
+            onChange={e => { const v = e.target.value; set({ max: v === '' || Number.isNaN(+v) ? null : +v }); }}
             className="w-full border rounded-xl px-3 py-2" />
         </div>
       </section>
