@@ -7,6 +7,8 @@ import AgentSteps, { Step } from './AgentSteps';
 import WhyPanel from './WhyPanel';
 import { splitSseEvents } from '@/lib/sse';
 import { suggestInvitees, FriendLite } from '@/lib/social';
+import VoiceButton from './VoiceButton';
+import { useVoice } from '@/hooks/useVoice';
 
 type Msg = {
   role: 'user' | 'agent';
@@ -25,6 +27,8 @@ export default function AgentPanel({ fullScreen = false }: { fullScreen?: boolea
   const [busy, setBusy] = useState(false);
   const lastQuery = useRef('');
   const [profile] = useState(() => (typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('qos_user') ?? 'null') : null));
+
+  const voice = useVoice(text => send(text));
 
   function patchLast(patch: Partial<Msg>) {
     setMsgs(m => [...m.slice(0, -1), { ...m[m.length - 1], ...patch }]);
@@ -59,6 +63,7 @@ export default function AgentPanel({ fullScreen = false }: { fullScreen?: boolea
           } else if (ev.event === 'result') {
             const r = ev.data as any;
             patchLast({ steps: steps.map(s => ({ ...s, done: true })), text: r.explanation, products: r.products, pool: r.pool, done: true });
+            voice.speak(r.explanation ?? '');
           }
         }
       }
@@ -69,6 +74,7 @@ export default function AgentPanel({ fullScreen = false }: { fullScreen?: boolea
         });
         const r = await res.json();
         patchLast({ steps: [], text: r.explanation, products: r.products, pool: r.pool, done: true });
+        voice.speak(r.explanation ?? '');
       }
     } catch {
       patchLast({ steps: [], text: 'Агент недоступен — попробуйте ещё раз.', done: true });
@@ -96,6 +102,8 @@ export default function AgentPanel({ fullScreen = false }: { fullScreen?: boolea
     <div className={`flex flex-col ${fullScreen ? 'min-h-[calc(100vh-3.5rem)]' : 'h-full'}`}>
       <div className="flex items-center justify-between px-4 py-2.5 border-b">
         <p className="text-sm font-semibold">🤖 AI-агент</p>
+        <button onClick={voice.toggleTts} aria-label={voice.ttsOn ? 'Выключить озвучку' : 'Включить озвучку'}
+          className="w-9 h-9 rounded-full hover:bg-zinc-100">{voice.ttsOn ? '🔊' : '🔇'}</button>
       </div>
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 pb-32">
         {msgs.map((m, i) => (
@@ -135,8 +143,11 @@ export default function AgentPanel({ fullScreen = false }: { fullScreen?: boolea
         <input
           aria-label="Сообщение агенту"
           className="flex-1 border rounded-full px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-zinc-900/10"
-          value={input} onChange={e => setInput(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && send(input)} placeholder="Что хотите купить?" />
+          value={voice.listening && voice.interim ? voice.interim : input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && send(input)}
+          placeholder={voice.listening ? 'Говорите…' : 'Что хотите купить?'} />
+        {voice.supported && <VoiceButton listening={voice.listening} onStart={voice.start} onStop={voice.stop} />}
         <button onClick={() => send(input)} disabled={busy} aria-label="Отправить"
           className="bg-zinc-900 text-white rounded-full w-12 h-12 shrink-0 disabled:opacity-40">→</button>
       </div>
