@@ -43,6 +43,14 @@ async function seedProducts() {
 async function seedDemoGraph() {
   if (journal.demoSeeded) { console.log('skip demo graph'); return; }
 
+  // защита от повторного прогона без журнала: демо-граф определяем по маркеру device_id
+  const { count: existing } = await db.from('users').select('*', { count: 'exact', head: true }).eq('device_id', 'demo-seed');
+  if (existing && existing > 0) {
+    console.log('demo users already present, skipping graph');
+    journal.demoSeeded = true; save();
+    return;
+  }
+
   const users = DEMO_USERS.map(u => ({
     name: u.name,
     phone_hash: Buffer.from(u.phone).toString('base64'),
@@ -73,8 +81,8 @@ async function seedDemoGraph() {
     { cat: 'home',        name: 'Home Drop (провал)',   n: 7, status: 'expired', exp: -2 },
   ];
   for (const def of poolDefs) {
-    const { data: prod } = await db.from('products').select('id').eq('category', def.cat).limit(1).single();
-    if (!prod) { console.warn('no product for', def.cat); continue; }
+    const { data: prod, error: prodErr } = await db.from('products').select('id').eq('category', def.cat).limit(1).single();
+    if (!prod) { console.warn('no product for', def.cat, prodErr?.message ?? ''); continue; }
     const { data: pool, error: pErr } = await db.from('pools').insert({
       product_id: prod.id, city: 'Almaty', name: def.name, status: def.status,
       min_participants: 10, current_participants: def.n, expires_at: hours(def.exp),
@@ -82,7 +90,7 @@ async function seedDemoGraph() {
     if (pErr || !pool) { console.error(def.name, pErr?.message); continue; }
     const members = demo.slice(0, Math.min(def.n, demo.length)).map(d => ({
       pool_id: pool.id, user_id: d.id,
-      phone_hash: `seed:${pool.id}:${d.id}`, device_id: `seed:${pool.id}:${d.id}`,
+      phone_hash: `seed-ph:${pool.id}:${d.id}`, device_id: `seed-dev:${pool.id}:${d.id}`,
     }));
     const { error: mErr } = await db.from('pool_members').insert(members);
     if (mErr) console.error(def.name, 'members:', mErr.message);
