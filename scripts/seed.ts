@@ -34,17 +34,25 @@ const CURATED = [
 async function main() {
   let total = 0;
   for (const [category, queries] of Object.entries(QUERIES)) {
-    for (const q of queries) {
-      const items = await searchShopping(q, category);
-      if (items.length) {
-        const { error } = await db.from('products').insert(items);
-        if (error) console.error(q, error.message); else total += items.length;
+    // resume: пропускаем запросы, уже отработавшие в прошлом прогоне (~40 товаров на запрос)
+    const { count } = await db.from('products').select('*', { count: 'exact', head: true }).eq('category', category);
+    const skip = Math.floor((count ?? 0) / 40);
+    for (const [qi, q] of queries.entries()) {
+      if (qi < skip) { console.log(`${category} / "${q}": skip (уже в базе)`); continue; }
+      try {
+        const items = await searchShopping(q, category);
+        if (items.length) {
+          const { error } = await db.from('products').insert(items);
+          if (error) console.error(q, error.message); else total += items.length;
+        }
+        console.log(`${category} / "${q}": +${items.length}`);
+      } catch (e: any) {
+        console.log(`${category} / "${q}": сеть упала (${e?.cause?.code ?? e.message}) — продолжаю`);
       }
-      console.log(`${category} / "${q}": +${items.length}`);
-      await new Promise(r => setTimeout(r, 1500)); // уважаем 50 req/час? нет: 24 запроса разом ок, пауза для вежливости
+      await new Promise(r => setTimeout(r, 1500));
     }
   }
-  console.log(`Products seeded: ${total}`);
+  console.log(`Products seeded (этим прогоном): ${total}`);
 
   if (total === 0) {
     const { error } = await db.from('products').insert(CURATED);
@@ -53,6 +61,8 @@ async function main() {
   }
 
   // Демо-пулы: активный 7/10, почти полный 9/10, истёкший (для показа провала)
+  const { count: poolCount } = await db.from('pools').select('*', { count: 'exact', head: true });
+  if ((poolCount ?? 0) > 0) { console.log(`Pools уже есть (${poolCount}) — пропускаю создание`); return; }
   const { data: prods } = await db.from('products').select('id, title, category').limit(200);
   if (!prods?.length) throw new Error('no products');
   const pick = (cat: string, n = 0) => prods.filter(p => p.category === cat)[n] ?? prods[0];
