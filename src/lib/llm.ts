@@ -30,7 +30,7 @@ export async function parseIntent(text: string): Promise<Intent> {
       model: 'llama-3.3-70b-versatile',
       response_format: { type: 'json_object' },
       messages: [
-        { role: 'system', content: `Extract purchase intent JSON {"query_en": string, "budget_max": number|null (KZT), "city": string (default "Almaty"), "category": one of ${JSON.stringify(CATS)} or null}. JSON only.` },
+        { role: 'system', content: `Извлеки из запроса покупки JSON {"query_en": string (короткий поисковый запрос на английском), "budget_max": number|null (в KZT), "city": string (латиницей, default "Almaty"), "category": одна из ${JSON.stringify(CATS)} или null}. Только JSON.` },
         { role: 'user', content: text },
       ],
     });
@@ -38,7 +38,7 @@ export async function parseIntent(text: string): Promise<Intent> {
     if (!parsed.query_en) throw new Error('empty');
     return { query_en: parsed.query_en, budget_max: parsed.budget_max ?? null, city: parsed.city ?? 'Almaty', category: CATS.includes(parsed.category) ? parsed.category : null };
   } catch {
-    return fallbackParse(text);
+    return fallbackParse(text); // сцена не должна умереть
   }
 }
 
@@ -53,8 +53,8 @@ export async function explain(chips: Chip[], pool: Parameters<typeof templateExp
     const res = await groq().chat.completions.create({
       model: 'llama-3.3-70b-versatile',
       messages: [
-        { role: 'system', content: 'One friendly sentence in Russian: why the product fits (based on facts below) and suggest the group if any. No fabrications.' },
-        { role: 'user', content: `Query: ${query}\nFacts: ${chips.filter(c => c.hit).map(c => c.label).join(', ')}\nGroup: ${pool ? `${pool.name} ${pool.current_participants}/${pool.min_participants}` : 'none'}` },
+        { role: 'system', content: 'Одно дружелюбное предложение на русском: почему товар подходит (по фактам ниже) и предложи группу, если есть. Без выдумок.' },
+        { role: 'user', content: `Запрос: ${query}\nФакты: ${chips.filter(c => c.hit).map(c => c.label).join(', ')}\nГруппа: ${pool ? `${pool.name} ${pool.current_participants}/${pool.min_participants}` : 'нет'}` },
       ],
     });
     return res.choices[0].message.content ?? templateExplanation(chips, pool);
