@@ -20,15 +20,35 @@ async function runPipeline(message: string, profile: any, emit: (text: string) =
   emit(`Понял запрос: ${intent.query_en}${budget ? `, бюджет до ${formatKzt(budget)}` : ''}`);
 
   const tokens = intent.query_en.toLowerCase().split(/\s+/).filter(t => t.length >= 3);
-  const orExpr = (tokens.length ? tokens : [intent.query_en]).map(t => `title.ilike.%${t}%`).join(',');
-  let { data: products = [] } = await db.from('products')
-    .select('*')
-    .or(orExpr)
-    .limit(60);
+
+  // существительное запроса → подкатегория: «laptop» ищет по полке laptops,
+  // а не по слову в названии (иначе побеждают «power bank FOR laptop» и подставки)
+  const SUB_HINTS: Record<string, string> = {
+    laptop: 'laptops', laptops: 'laptops', notebook: 'laptops', macbook: 'laptops', chromebook: 'laptops',
+    tablet: 'tablets', tablets: 'tablets', ipad: 'tablets',
+    smartphone: 'smartphones', smartphones: 'smartphones', phone: 'smartphones', iphone: 'smartphones',
+    earbuds: 'earbuds', earbud: 'earbuds', airpods: 'earbuds',
+    headphone: 'headphones', headphones: 'headphones', headset: 'headphones',
+    speaker: 'speakers', speakers: 'speakers',
+    keyboard: 'peripherals', mouse: 'peripherals',
+    watch: 'wearables', smartwatch: 'wearables', tracker: 'wearables', band: 'wearables',
+    charger: 'chargers', powerbank: 'chargers',
+    hub: 'storage', ssd: 'storage',
+    kettle: 'small_appliances', vacuum: 'cleaning', humidifier: 'climate', backpack: 'backpacks',
+  };
+  const subHit = tokens.map(t => SUB_HINTS[t]).find(Boolean);
+
+  let products: any[] | null = [];
+  if (subHit) {
+    ({ data: products = [] } = await db.from('products').select('*').eq('subcategory', subHit).limit(60));
+  } else {
+    const orExpr = (tokens.length ? tokens : [intent.query_en]).map(t => `title.ilike.%${t}%`).join(',');
+    ({ data: products = [] } = await db.from('products').select('*').or(orExpr).limit(60));
+  }
 
   // пословный матчинг с границами слов; приоритет: все слова → главное существительное → ничего
   // («gaming headphones»: сперва gaming∧headphones, иначе любые headphones — но не gaming-мыши)
-  if (tokens.length) {
+  if (tokens.length && !subHit) {
     const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const matchTok = (title: string, t: string) => new RegExp(`\\b(i|smart|e)?${esc(t)}`, 'i').test(title);
     const all = (products ?? []).filter(p => tokens.every(t => matchTok(p.title, t)));
