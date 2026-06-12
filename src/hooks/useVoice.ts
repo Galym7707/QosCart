@@ -38,7 +38,7 @@ export function useVoice(onFinal: (text: string) => void) {
     rec.interimResults = true;
     rec.continuous = true;            // не обрываемся на паузах движка
     finalRef.current = '';
-    // ждём начала речи до 7с; после каждой реплики — ещё 2.8с тишины на продолжение
+    // ждём начала речи до 4с; после каждой реплики — ещё 1.4с тишины на продолжение
     const arm = (ms: number) => {
       if (silenceRef.current) clearTimeout(silenceRef.current);
       silenceRef.current = setTimeout(() => { try { rec.stop(); } catch {} }, ms);
@@ -51,7 +51,7 @@ export function useVoice(onFinal: (text: string) => void) {
         else inter += res[0].transcript;
       }
       setInterim((finalRef.current + inter).trim());
-      arm(2800);
+      arm(1400);
     };
     rec.onend = () => {
       clearTimers();
@@ -62,7 +62,7 @@ export function useVoice(onFinal: (text: string) => void) {
     };
     rec.onerror = () => { clearTimers(); setListening(false); setInterim(''); finalRef.current = ''; };
     setListening(true);
-    arm(7000);
+    arm(4000);
     maxRef.current = setTimeout(() => { try { rec.stop(); } catch {} }, 30000);  // потолок сессии
     rec.start();
   }, [listening]);
