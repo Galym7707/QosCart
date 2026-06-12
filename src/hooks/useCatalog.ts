@@ -27,14 +27,22 @@ export function useCatalog() {
   useEffect(() => {
     (async () => {
       try {
-        const [{ data: prods }, { data: pools }, liked] = await Promise.all([
-          supabase.from('products')
-            .select('id,title,category,subcategory,price_kzt,rating,reviews_count,image_url,source,fetched_at,color,release_year,purchases_count,weight_g,warranty_months,attrs')
-            .limit(2000),
+        const fetchAllProducts = async () => {
+          const cols = 'id,title,category,subcategory,price_kzt,rating,reviews_count,image_url,source,fetched_at,color,release_year,purchases_count,weight_g,warranty_months,attrs';
+          const all: CatalogProduct[] = [];
+          for (let page = 0; page < 10; page++) {
+            const { data } = await supabase.from('products').select(cols).order('id').range(page * 1000, page * 1000 + 999);
+            all.push(...((data ?? []) as CatalogProduct[]));
+            if (!data || data.length < 1000) break;
+          }
+          return all;
+        };
+        const [prods, { data: pools }, liked] = await Promise.all([
+          fetchAllProducts(),
           supabase.from('pools').select('*').eq('status', 'forming').gt('expires_at', new Date().toISOString()),
           user?.id ? fetchLikedIds(user.id) : Promise.resolve(new Set<string>()),
         ]);
-        setProducts(prods ?? []);
+        setProducts(prods);
         setLikedIds(liked);
         setPoolParticipants(new Map((pools ?? []).map(p => [p.product_id, p.current_participants])));
         setPoolByProduct(new Map((pools ?? []).map(p => [p.product_id, p])));
