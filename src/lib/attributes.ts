@@ -13,6 +13,9 @@ export const COLORS: Color[] = [
   { slug: 'pink',   ru: 'Розовый',    hex: '#ec4899' },
   { slug: 'yellow', ru: 'Жёлтый',     hex: '#eab308' },
   { slug: 'gold',   ru: 'Золотистый', hex: '#d4af37' },
+  { slug: 'purple', ru: 'Фиолетовый', hex: '#8b5cf6' },
+  { slug: 'orange', ru: 'Оранжевый',  hex: '#f97316' },
+  { slug: 'brown',  ru: 'Коричневый', hex: '#92400e' },
 ];
 
 const BY_SLUG = new Map(COLORS.map(c => [c.slug, c]));
