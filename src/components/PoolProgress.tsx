@@ -1,6 +1,7 @@
 // src/components/PoolProgress.tsx
 'use client';
 import { useEffect, useState } from 'react';
+import Icon from './Icon';
 
 export default function PoolProgress({ pool }: { pool: any }) {
   const [left, setLeft] = useState('');
@@ -23,7 +24,7 @@ export default function PoolProgress({ pool }: { pool: any }) {
       <div className="h-3 bg-zinc-100 rounded-full overflow-hidden">
         <div className="h-full bg-emerald-500 transition-all duration-700" style={{ width: `${pct}%` }} />
       </div>
-      <p className="text-[11px] text-emerald-700 mt-1">🛡 Все участники — верифицированные устройства (анти-бот защита)</p>
+      <p className="text-[11px] text-emerald-700 mt-1 flex items-center gap-1"><Icon name="shield" size={12} className="shrink-0" />Все участники — верифицированные устройства (анти-бот защита)</p>
     </div>
   );
 }

@@ -62,7 +62,7 @@ npm run dev
 
 ---
 
-## Демо-сценарий для сцены (5 минут)
+## Демо-сценарий для сцены (5 минут) — v1, устарел: актуальный сценарий см. в разделе «v2 (post-hackathon)» ниже
 
 Код подтверждения OTP в демо: **000000**
 
@@ -82,7 +82,7 @@ npm run dev
 npm test
 ```
 
-23 юнит-теста логики (`tests/`): currency, ladder, scoring, joinRules, normalize, llm-fallback. Все тесты — чистые функции без сети.
+54 юнит-теста логики (`tests/`): currency, ladder, scoring (v2, 8 факторов), joinRules, normalize, llm-fallback, categories, filters, sse, social, voice. Все тесты — чистые функции без сети.
 
 ---
 
@@ -100,7 +100,7 @@ npx vercel --prod
 
 **SerpAPI лимит 50 req/час** → подождать или работать с уже засеянной базой (seed уже завершён — каталог в Supabase живёт независимо).
 
-**Realtime молчит** → проверить, что таблица `pools` включена в Publication `supabase_realtime` (Supabase Dashboard → Database → Publications); либо раскомментировать поллинг в `src/app/product/[id]/page.tsx` (добавить `setInterval`-перезапрос пула раз в 1500 мс).
+**Realtime молчит** → проверить, что таблица `pools` включена в Publication `supabase_realtime` (Supabase Dashboard → Database → Publications); либо раскомментировать поллинг в `src/app/(shop)/product/[id]/page.tsx` (добавить `setInterval`-перезапрос пула раз в 1500 мс).
 
 **LLM недоступен** → агент автоматически переходит на regex-парсинг интента и шаблонные объяснения (`fallbackParse` + `templateExplanation` в `src/lib/llm.ts`) — это штатный сценарий, демо продолжается.
 
@@ -116,3 +116,23 @@ Task 13 из плана (`docs/superpowers/plans/2026-06-11-qoscart-mvp.md`):
 4. В онбординге: если `TWILIO_*` заданы — слать реальный код, иначе фолбэк на `DEMO_OTP` (код `000000` обязан остаться рабочим!).
 
 **Внимание:** у Twilio Trial максимум 5 верифицированных номеров. Верифицировать телефоны всех участников демо заранее в Console → Verified Caller IDs.
+
+## v2 (post-hackathon)
+
+Новое: двухуровневый каталог 12×36 (≈3800 реальных товаров через SerpAPI), сортировки/фильтры/лайки/поиск
+с URL-state, адаптивный marketplace-layout (mobile/tablet/desktop, агент-док справа), SSE-агент с живыми
+шагами и why-panel (8 факторов = 100), социальный граф (друзья по имени/телефону, invite-ссылки,
+друзья в пулах), голосовой ввод/вывод (Web Speech API, Chrome).
+
+Setup v2:
+1. `npm run migrate -- scripts/migrations/002_v2.sql`
+2. `npm run seed:v2`   # резюмируемый; ~72 SerpAPI-запроса, журнал scripts/.seed-journal.json
+3. `npm run dev`
+
+Демо-сценарий (5 мин):
+1. Onboarding с OTP → лента: грид, фильтры (Аудио → Наушники TWS), сортировка «Выгода группы», лайк.
+2. Десктоп: агент-док справа → голосом «наушники до 20 000 тенге» → живые шаги → «Почему это вам».
+3. Профиль → «Найти друзей» → карточка с пулом: аватары друзей → join → копия invite-ссылки.
+4. Второе окно (инкогнито): onboarding → invite-ссылка → join → realtime-прогресс в первом окне,
+   взаимная дружба (source='invite'), nudge «друг уже в группе» в ленте.
+5. Показ провала: карточка с истёкшим пулом → варианты (возврат/доплата/+2 часа).

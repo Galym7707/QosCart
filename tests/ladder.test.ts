@@ -24,6 +24,6 @@ describe('price ladder', () => {
   it('ladderFor: полная лестница для UI', () => {
     const l = ladderFor(RETAIL);
     expect(l).toHaveLength(4);
-    expect(l[2]).toEqual({ threshold: 10, price: 13520, label: 'Main group' });
+    expect(l[2]).toEqual({ threshold: 10, price: 13520, label: 'Основная группа' });
   });
 });

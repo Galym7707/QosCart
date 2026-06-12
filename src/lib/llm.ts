@@ -5,7 +5,7 @@ import type { Chip } from './scoring';
 export type Intent = { query_en: string; budget_max: number | null; city: string; category: string | null };
 
 const CITIES: Record<string, string> = { 'алматы': 'Almaty', 'астана': 'Astana', 'шымкент': 'Shymkent', 'almaty': 'Almaty', 'astana': 'Astana' };
-const CATS = ['tech', 'study', 'home', 'fashion', 'sport', 'beauty'];
+const CATS = ['electronics', 'audio', 'computers', 'appliances', 'home', 'kitchen', 'fashion', 'beauty', 'sport', 'study', 'kids', 'travel'];
 
 export function fallbackParse(text: string): Intent {
   const budget = text.match(/(\d[\d\s]{2,})\s*(kzt|тг|тенге|₸)/i);

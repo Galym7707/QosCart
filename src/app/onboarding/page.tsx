@@ -3,7 +3,10 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
-const INTERESTS = ['tech', 'study', 'home', 'fashion', 'sport', 'beauty'];
+import { CATEGORIES } from '@/lib/categories';
+import Icon from '@/components/Icon';
+
+const INTERESTS = CATEGORIES.map(c => ({ slug: c.slug, ru: c.ru }));
 
 export default function Onboarding() {
   const r = useRouter();
@@ -37,7 +40,7 @@ export default function Onboarding() {
 
   async function finish() {
     const device_id = crypto.randomUUID();
-    const phone_hash = btoa(phone); // demo-хэш; не хранить открытый номер
+    const phone_hash = btoa(phone.replace(/[^\d+]/g, '')); // demo-хэш; не хранить открытый номер
     const { data, error } = await supabase.from('users').insert({
       name, phone_hash, device_id, city: 'Almaty', interests: sel, budget_kzt: budget, esim_verified: true,
     }).select('id').single();
@@ -47,7 +50,7 @@ export default function Onboarding() {
   }
 
   if (step === 'form') return (
-    <div className="p-6 flex flex-col gap-4">
+    <div className="mx-auto max-w-md p-6 flex flex-col gap-4">
       <h2 className="text-xl font-bold pt-8">Регистрация</h2>
       <input className="border rounded-xl p-4" placeholder="Имя" value={name} onChange={e => setName(e.target.value)} />
       <input className="border rounded-xl p-4" placeholder="+7 ___ ___ __ __" value={phone} onChange={e => setPhone(e.target.value)} />
@@ -56,26 +59,26 @@ export default function Onboarding() {
   );
 
   if (step === 'otp') return (
-    <div className="p-6 flex flex-col gap-4">
+    <div className="mx-auto max-w-md p-6 flex flex-col gap-4">
       <h2 className="text-xl font-bold pt-8">Подтверждение SIM</h2>
       <p className="text-sm text-zinc-500">{otpMode === 'sms' ? `Мы отправили SMS-код на ${phone}` : `SMS недоступно для ${phone} — введите демо-код`}</p>
       <input className="border rounded-xl p-4 text-center text-2xl tracking-[0.5em]" maxLength={6} value={code} onChange={e => setCode(e.target.value)} />
       {err && <p className="text-red-500 text-sm">{err}</p>}
       <button disabled={busy} onClick={checkCode} className="bg-black text-white rounded-2xl py-4 disabled:opacity-40">{busy ? 'Проверяю…' : 'Подтвердить'}</button>
       <div className="mt-4 border border-emerald-300 bg-emerald-50 rounded-2xl p-4 text-sm text-emerald-800">
-        🛡 Trust Passport: телефон будет привязан к устройству. Уровень 2 — верификация через SIM/eSIM ID оператора.
+        <Icon name="shield" size={15} className="inline -mt-0.5 mr-1" /> Trust Passport: телефон будет привязан к устройству. Уровень 2 — верификация через SIM/eSIM ID оператора.
       </div>
     </div>
   );
 
   return (
-    <div className="p-6 flex flex-col gap-4">
-      <div className="mt-4 border border-emerald-300 bg-emerald-50 rounded-2xl p-3 text-sm text-emerald-800">✅ Пользователь подтверждён через SIM/eSIM ID · устройство привязано</div>
+    <div className="mx-auto max-w-md p-6 flex flex-col gap-4">
+      <div className="mt-4 border border-emerald-300 bg-emerald-50 rounded-2xl p-3 text-sm text-emerald-800"><span className="flex items-center gap-1.5"><Icon name="check-circle" size={16} className="shrink-0" />Пользователь подтверждён через SIM/eSIM ID · устройство привязано</span></div>
       <h2 className="text-xl font-bold">Интересы и бюджет</h2>
       <div className="flex flex-wrap gap-2">
         {INTERESTS.map(i => (
-          <button key={i} onClick={() => setSel(s => s.includes(i) ? s.filter(x => x !== i) : [...s, i])}
-            className={`px-4 py-2 rounded-full border ${sel.includes(i) ? 'bg-black text-white' : 'bg-white'}`}>{i}</button>
+          <button key={i.slug} onClick={() => setSel(s => s.includes(i.slug) ? s.filter(x => x !== i.slug) : [...s, i.slug])}
+            className={`px-4 py-2 rounded-full border text-sm ${sel.includes(i.slug) ? 'bg-black text-white' : 'bg-white'}`}>{i.ru}</button>
         ))}
       </div>
       <label className="text-sm text-zinc-500">Бюджет: {budget.toLocaleString('ru-RU')} ₸</label>
