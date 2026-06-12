@@ -4,12 +4,13 @@ import { DEFAULT_FILTERS, applyFilters, applySort, filtersFromParams, paramsFrom
 
 const P = (over: Partial<any> = {}) => ({
   id: 'p1', title: 'Anker PowerCore', category: 'electronics', subcategory: 'chargers',
-  price_kzt: 13510, rating: 4.6, reviews_count: 1280, fetched_at: '2026-06-10T10:00:00Z', score: 50, ...over,
+  price_kzt: 13510, rating: 4.6, reviews_count: 1280, fetched_at: '2026-06-10T10:00:00Z', score: 50,
+  color: 'black', release_year: 2024, purchases_count: 5000, weight_g: 300, warranty_months: 12, ...over,
 });
 const items = [
-  P({ id: 'a', title: 'Anker PowerCore', price_kzt: 13510, rating: 4.6, reviews_count: 1280, score: 80 }),
-  P({ id: 'b', title: 'JBL Speaker', category: 'audio', subcategory: 'speakers', price_kzt: 25000, rating: 4.2, reviews_count: 300, fetched_at: '2026-06-11T10:00:00Z', score: 60 }),
-  P({ id: 'c', title: 'Cheap cable', price_kzt: 1500, rating: 3.0, reviews_count: 12, fetched_at: '2026-06-09T10:00:00Z', score: 20 }),
+  P({ id: 'a', title: 'Anker PowerCore', price_kzt: 13510, rating: 4.6, reviews_count: 1280, score: 80, color: 'white', release_year: 2024, purchases_count: 5000, weight_g: 300, warranty_months: 12 }),
+  P({ id: 'b', title: 'JBL Speaker', category: 'audio', subcategory: 'speakers', price_kzt: 25000, rating: 4.2, reviews_count: 300, fetched_at: '2026-06-11T10:00:00Z', score: 60, color: 'red', release_year: 2026, purchases_count: 900, weight_g: 600, warranty_months: 24 }),
+  P({ id: 'c', title: 'Cheap cable', price_kzt: 1500, rating: 3.0, reviews_count: 12, fetched_at: '2026-06-09T10:00:00Z', score: 20, color: 'black', release_year: 2022, purchases_count: 12000, weight_g: 50, warranty_months: 6 }),
 ];
 const ctx = { likedIds: new Set(['b']), poolParticipants: new Map([['a', 9]]) };
 
@@ -42,6 +43,17 @@ describe('applySort', () => {
   });
   it('savings: реальная экономия с учётом прогресса пула (у a пул 9 человек → скидка есть, у других нет)', () => {
     expect(applySort(items, 'savings', ctx)[0].id).toBe('a');
+  });
+  it('purchases / year / weight / warranty', () => {
+    expect(applySort(items, 'purchases', ctx).map(i => i.id)).toEqual(['c', 'a', 'b']);
+    expect(applySort(items, 'year', ctx).map(i => i.id)).toEqual(['b', 'a', 'c']);
+    expect(applySort(items, 'weight', ctx).map(i => i.id)).toEqual(['c', 'a', 'b']);
+    expect(applySort(items, 'warranty', ctx).map(i => i.id)).toEqual(['b', 'a', 'c']);
+  });
+  it('color: по алфавиту русских названий (Белый < Красный < Чёрный), null в конец', () => {
+    expect(applySort(items, 'color', ctx).map(i => i.id)).toEqual(['a', 'b', 'c']);
+    const withNull = [...items, P({ id: 'd', color: null })];
+    expect(applySort(withNull, 'color', ctx)[3].id).toBe('d');
   });
   it('не мутирует вход', () => {
     const before = items.map(i => i.id).join();

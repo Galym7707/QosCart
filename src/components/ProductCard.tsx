@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { formatKzt } from '@/lib/currency';
 import { currentPrice } from '@/lib/ladder';
 import LikeButton from './LikeButton';
+import { colorHex, colorLabel, formatPurchases } from '@/lib/attributes';
 import type { Chip } from '@/lib/scoring';
 import Icon from './Icon';
 
@@ -27,7 +28,13 @@ export default function ProductCard({ p, pool = null, liked = false, onToggleLik
       </div>
       <div className="p-3 flex flex-col gap-1 flex-1">
         <p className="text-sm leading-snug line-clamp-2 min-h-[2.5rem]">{p.title}</p>
-        <p className="text-xs text-zinc-400">★ {p.rating ?? '—'}{p.reviews_count ? ` · ${p.reviews_count}` : ''}</p>
+        <p className="text-xs text-zinc-400">★ {p.rating ?? '—'}{p.reviews_count ? ` (${p.reviews_count})` : ''}{p.purchases_count ? ` · ${formatPurchases(p.purchases_count)}` : ''}</p>
+        {(p.color || p.release_year) && (
+          <p className="text-xs text-zinc-400 flex items-center gap-1.5">
+            {p.color && <><span className="w-3 h-3 rounded-full border border-zinc-200 inline-block shrink-0" style={{ backgroundColor: colorHex(p.color) }} />{colorLabel(p.color)}</>}
+            {p.release_year && <span>· {p.release_year}</span>}
+          </p>
+        )}
         <p className="mt-auto pt-1">
           <b className="text-emerald-700">{formatKzt(groupPrice)}</b>{' '}
           <s className="text-xs text-zinc-400">{formatKzt(p.price_kzt)}</s>

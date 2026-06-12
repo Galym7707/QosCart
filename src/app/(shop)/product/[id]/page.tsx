@@ -7,6 +7,7 @@ import { ladderFor, currentPrice, savings, nextUnlock } from '@/lib/ladder';
 import PoolProgress from '@/components/PoolProgress';
 import FriendAvatars from '@/components/FriendAvatars';
 import Icon from '@/components/Icon';
+import { colorHex, colorLabel } from '@/lib/attributes';
 
 function ProductInner() {
   const { id } = useParams<{ id: string }>();
@@ -113,6 +114,18 @@ function ProductInner() {
             <button className="border rounded-xl py-3 text-sm bg-white flex items-center justify-center gap-2"><Icon name="share" size={16} />Расшарить ссылку: +2 часа таймера</button>
           </div>
         )}
+      </div>
+
+      <div className="border rounded-2xl p-4">
+        <p className="font-semibold text-sm mb-2">Характеристики</p>
+        <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
+          {p.color && <><dt className="text-zinc-400">Цвет</dt><dd className="flex items-center gap-1.5"><span className="w-3 h-3 rounded-full border border-zinc-200 inline-block" style={{ backgroundColor: colorHex(p.color) }} />{colorLabel(p.color)}</dd></>}
+          {p.release_year && <><dt className="text-zinc-400">Год выпуска</dt><dd>{p.release_year}</dd></>}
+          {p.weight_g && <><dt className="text-zinc-400">Вес</dt><dd>{p.weight_g >= 1000 ? `${(p.weight_g / 1000).toFixed(1).replace('.', ',')} кг` : `${p.weight_g} г`}</dd></>}
+          {p.warranty_months && <><dt className="text-zinc-400">Гарантия</dt><dd>{p.warranty_months} мес.</dd></>}
+          {p.purchases_count != null && <><dt className="text-zinc-400">Купили</dt><dd>{p.purchases_count.toLocaleString('ru-RU')} раз</dd></>}
+          {p.reviews_count != null && <><dt className="text-zinc-400">Отзывы</dt><dd>{p.reviews_count.toLocaleString('ru-RU')}</dd></>}
+        </dl>
       </div>
     </div>
   );

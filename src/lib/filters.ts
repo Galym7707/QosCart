@@ -1,10 +1,16 @@
 // src/lib/filters.ts
 import { currentPrice } from './ladder';
+import { colorLabel } from './attributes';
 
-export type SortKey = 'relevance' | 'price_asc' | 'price_desc' | 'rating' | 'savings' | 'popularity' | 'newest';
+export type SortKey =
+  | 'relevance' | 'price_asc' | 'price_desc' | 'rating' | 'savings'
+  | 'purchases' | 'popularity' | 'year' | 'newest' | 'color' | 'weight' | 'warranty';
 export const SORT_LABELS: Record<SortKey, string> = {
   relevance: 'По релевантности', price_asc: 'Дешевле', price_desc: 'Дороже',
-  rating: 'По рейтингу', savings: 'Выгода группы', popularity: 'Популярные', newest: 'Новинки',
+  rating: 'По рейтингу', savings: 'Выгода группы',
+  purchases: 'Чаще покупают', popularity: 'Больше отзывов',
+  year: 'Новее по году', newest: 'Недавно добавлены',
+  color: 'По цвету', weight: 'Легче', warranty: 'Гарантия дольше',
 };
 
 export type FilterState = {
@@ -18,6 +24,8 @@ export type ProductLike = {
   id: string; title: string; category: string; subcategory: string | null;
   price_kzt: number; rating: number | null; reviews_count: number | null;
   fetched_at: string; score?: number;
+  color?: string | null; release_year?: number | null; purchases_count?: number | null;
+  weight_g?: number | null; warranty_months?: number | null;
 };
 export type CatalogCtx = { likedIds: Set<string>; poolParticipants: Map<string, number> };
 
@@ -45,6 +53,16 @@ export function applySort<T extends ProductLike>(items: T[], key: SortKey, ctx: 
     case 'popularity': return a.sort((x, y) => (y.reviews_count ?? 0) - (x.reviews_count ?? 0));
     case 'newest':     return a.sort((x, y) => (Date.parse(y.fetched_at) || 0) - (Date.parse(x.fetched_at) || 0));
     case 'savings':    return a.sort((x, y) => savingsNow(y) - savingsNow(x));
+    case 'purchases':  return a.sort((x, y) => (y.purchases_count ?? 0) - (x.purchases_count ?? 0));
+    case 'year':       return a.sort((x, y) => (y.release_year ?? 0) - (x.release_year ?? 0));
+    case 'color':      return a.sort((x, y) => {
+      if (!x.color && !y.color) return 0;
+      if (!x.color) return 1;
+      if (!y.color) return -1;
+      return colorLabel(x.color).localeCompare(colorLabel(y.color), 'ru');
+    });
+    case 'weight':     return a.sort((x, y) => (x.weight_g ?? Number.MAX_SAFE_INTEGER) - (y.weight_g ?? Number.MAX_SAFE_INTEGER));
+    case 'warranty':   return a.sort((x, y) => (y.warranty_months ?? 0) - (x.warranty_months ?? 0));
     case 'relevance':
     default:           return a.sort((x, y) => (y.score ?? 0) - (x.score ?? 0));
   }
