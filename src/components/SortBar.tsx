@@ -4,7 +4,7 @@ import { SORT_LABELS, SortKey } from '@/lib/filters';
 
 export default function SortBar({ sort, onChange }: { sort: SortKey; onChange: (s: SortKey) => void }) {
   return (
-    <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+    <div className="grid grid-rows-2 grid-flow-col auto-cols-max gap-1.5 overflow-x-auto no-scrollbar py-1">
       {(Object.keys(SORT_LABELS) as SortKey[]).map(k => (
         <button key={k} onClick={() => onChange(k)}
           className={`shrink-0 text-xs px-3 py-1.5 rounded-full border transition

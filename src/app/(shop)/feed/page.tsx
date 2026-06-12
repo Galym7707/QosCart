@@ -20,6 +20,11 @@ function FeedInner() {
   const { products, ctx, poolByProduct, loading, onToggleLike, user } = useCatalog();
   const [sheetOpen, setSheetOpen] = useState(false);
 
+  const activeCount =
+    (filters.cat ? 1 : 0) + (filters.sub ? 1 : 0) + (filters.min != null || filters.max != null ? 1 : 0) +
+    (filters.rating != null ? 1 : 0) + (filters.pool ? 1 : 0) + (filters.liked ? 1 : 0) +
+    filters.colors.length + Object.values(filters.attrs).reduce((s, v) => s + v.length, 0);
+
   const update = (f: FilterState, s: SortKey) => {
     const qs = paramsFromFilters(f, s);
     router.replace(qs ? `/feed?${qs}` : '/feed', { scroll: false });
@@ -54,7 +59,8 @@ function FeedInner() {
           <div className="flex items-center gap-2">
             <div className="flex-1 min-w-0"><SortBar sort={sort} onChange={s => update(filters, s)} /></div>
             <button onClick={() => setSheetOpen(true)}
-              className="lg:hidden shrink-0 text-xs border rounded-full px-3 py-1.5 bg-white">Фильтры</button>
+              className="lg:hidden shrink-0 text-xs border rounded-full px-3 py-1.5 bg-white">
+              Фильтры{activeCount > 0 ? ` · ${activeCount}` : ''}</button>
           </div>
           <p className="text-xs text-zinc-400 mt-1">{loading ? 'Загрузка…' : `${visible.length} товаров`}</p>
 

@@ -13,6 +13,7 @@ const items = [
   P({ id: 'c', title: 'Cheap cable', price_kzt: 1500, rating: 3.0, reviews_count: 12, fetched_at: '2026-06-09T10:00:00Z', score: 20, color: 'black', release_year: 2022, purchases_count: 12000, weight_g: 50, warranty_months: 6 }),
 ];
 const ctx = { likedIds: new Set(['b']), poolParticipants: new Map([['a', 9]]) };
+const F = (over: Partial<FilterState> = {}): FilterState => ({ ...DEFAULT_FILTERS, ...over });
 
 describe('applyFilters', () => {
   it('категория и подкатегория', () => {
@@ -41,19 +42,24 @@ describe('applySort', () => {
     expect(applySort(items, 'newest', ctx).map(i => i.id)).toEqual(['b', 'a', 'c']);
     expect(applySort(items, 'relevance', ctx).map(i => i.id)).toEqual(['a', 'b', 'c']);
   });
-  it('savings: реальная экономия с учётом прогресса пула (у a пул 9 человек → скидка есть, у других нет)', () => {
-    expect(applySort(items, 'savings', ctx)[0].id).toBe('a');
+  it('фильтр по цветам (мультивыбор)', () => {
+    expect(applyFilters(items, F({ colors: ['red'] }), ctx).map(i => i.id)).toEqual(['b']);
+    expect(applyFilters(items, F({ colors: ['red', 'white'] }), ctx).map(i => i.id)).toEqual(['a', 'b']);
+  });
+  it('фильтр по характеристикам: все выбранные ключи должны совпасть', () => {
+    const withAttrs = [
+      P({ id: 'x', subcategory: 'laptops', attrs: { ram_gb: '16', cpu: 'Apple M3' } }),
+      P({ id: 'y', subcategory: 'laptops', attrs: { ram_gb: '8', cpu: 'Apple M3' } }),
+    ];
+    expect(applyFilters(withAttrs, F({ attrs: { ram_gb: ['16'] } }), ctx).map(i => i.id)).toEqual(['x']);
+    expect(applyFilters(withAttrs, F({ attrs: { ram_gb: ['8', '16'], cpu: ['Apple M3'] } }), ctx)).toHaveLength(2);
+    expect(applyFilters(withAttrs, F({ attrs: { cpu: ['Intel Core i5'] } }), ctx)).toHaveLength(0);
   });
   it('purchases / year / weight / warranty', () => {
     expect(applySort(items, 'purchases', ctx).map(i => i.id)).toEqual(['c', 'a', 'b']);
     expect(applySort(items, 'year', ctx).map(i => i.id)).toEqual(['b', 'a', 'c']);
     expect(applySort(items, 'weight', ctx).map(i => i.id)).toEqual(['c', 'a', 'b']);
     expect(applySort(items, 'warranty', ctx).map(i => i.id)).toEqual(['b', 'a', 'c']);
-  });
-  it('color: по алфавиту русских названий (Белый < Красный < Чёрный), null в конец', () => {
-    expect(applySort(items, 'color', ctx).map(i => i.id)).toEqual(['a', 'b', 'c']);
-    const withNull = [...items, P({ id: 'd', color: null })];
-    expect(applySort(withNull, 'color', ctx)[3].id).toBe('d');
   });
   it('не мутирует вход', () => {
     const before = items.map(i => i.id).join();
@@ -64,7 +70,7 @@ describe('applySort', () => {
 
 describe('URL state', () => {
   it('roundtrip: filters → params → filters', () => {
-    const f: FilterState = { cat: 'audio', sub: 'earbuds', min: 5000, max: 50000, rating: 4, pool: true, liked: false, q: 'sony' };
+    const f: FilterState = { cat: 'audio', sub: 'earbuds', min: 5000, max: 50000, rating: 4, pool: true, liked: false, q: 'sony', colors: ['black', 'white'], attrs: { anc: ['Да'], battery_h: ['9', '12'] } };
     const qs = paramsFromFilters(f, 'price_asc');
     const back = filtersFromParams(new URLSearchParams(qs));
     expect(back.filters).toEqual(f);

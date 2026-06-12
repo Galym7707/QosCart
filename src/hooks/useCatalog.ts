@@ -11,6 +11,7 @@ export type CatalogProduct = {
   image_url: string | null; source: string; fetched_at: string;
   color: string | null; release_year: number | null; purchases_count: number | null;
   weight_g: number | null; warranty_months: number | null;
+  attrs: Record<string, string | number | null> | null;
 };
 
 export function useCatalog() {
@@ -28,7 +29,7 @@ export function useCatalog() {
       try {
         const [{ data: prods }, { data: pools }, liked] = await Promise.all([
           supabase.from('products')
-            .select('id,title,category,subcategory,price_kzt,rating,reviews_count,image_url,source,fetched_at,color,release_year,purchases_count,weight_g,warranty_months')
+            .select('id,title,category,subcategory,price_kzt,rating,reviews_count,image_url,source,fetched_at,color,release_year,purchases_count,weight_g,warranty_months,attrs')
             .limit(2000),
           supabase.from('pools').select('*').eq('status', 'forming').gt('expires_at', new Date().toISOString()),
           user?.id ? fetchLikedIds(user.id) : Promise.resolve(new Set<string>()),

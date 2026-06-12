@@ -3,10 +3,11 @@ import { describe, it, expect } from 'vitest';
 import { CATEGORIES, LEGACY_MAP, allQueryJobs, parentLabel, subLabel } from '../src/lib/categories';
 
 describe('categories tree', () => {
-  it('12 родителей, у каждого ровно 3 подкатегории, у каждой 2 запроса', () => {
+  it('12 родителей, у каждого 3-5 подкатегорий, у каждой 2 запроса', () => {
     expect(CATEGORIES).toHaveLength(12);
     for (const c of CATEGORIES) {
-      expect(c.subs).toHaveLength(3);
+      expect(c.subs.length).toBeGreaterThanOrEqual(3);
+      expect(c.subs.length).toBeLessThanOrEqual(5);
       for (const s of c.subs) expect(s.queries).toHaveLength(2);
     }
   });
@@ -27,9 +28,10 @@ describe('categories tree', () => {
       expect(parents.has(LEGACY_MAP[old])).toBe(true);
     }
   });
-  it('allQueryJobs: 12×3×2 = 72 заданий с parent/sub/query', () => {
+  it('allQueryJobs: по 2 задания на каждую подкатегорию', () => {
     const jobs = allQueryJobs();
-    expect(jobs).toHaveLength(72);
+    const expected = CATEGORIES.reduce((s, c) => s + c.subs.length * 2, 0);
+    expect(jobs).toHaveLength(expected);
     expect(jobs[0]).toHaveProperty('cat');
     expect(jobs[0]).toHaveProperty('sub');
     expect(jobs[0]).toHaveProperty('query');
