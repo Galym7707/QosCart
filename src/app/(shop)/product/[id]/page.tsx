@@ -14,6 +14,7 @@ function ProductInner() {
   const [p, setP] = useState<any>(null);
   const [pool, setPool] = useState<any>(null);
   const [state, setState] = useState<'idle' | 'joined' | 'error'>('idle');
+  const [creating, setCreating] = useState(false);
   const [errText, setErrText] = useState('');
   const sp = useSearchParams();
   const inviterId = sp.get('invite');
@@ -52,6 +53,22 @@ function ProductInner() {
   const n = pool?.current_participants ?? 0;
   const unlock = nextUnlock(p.price_kzt, n);
 
+  async function createPool() {
+    const u = JSON.parse(localStorage.getItem('qos_user') ?? 'null');
+    if (!u) { setErrText('Сначала пройдите регистрацию'); setState('error'); return; }
+    setCreating(true);
+    const res = await fetch('/api/pools/create', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ productId: id, userId: u.id }) });
+    setCreating(false);
+    if (res.ok) {
+      const { pool: created } = await res.json();
+      setPool(created); setState('joined');
+    } else {
+      const { error } = await res.json().catch(() => ({ error: 'create_failed' }));
+      setErrText(error === 'not_verified' ? 'Нужна верификация' : error === 'already_exists' ? 'Группа уже есть — обновите страницу' : 'Не получилось создать группу');
+      setState('error');
+    }
+  }
+
   async function join() {
     const u = JSON.parse(localStorage.getItem('qos_user') ?? 'null');
     if (!u) { setErrText('Сначала пройдите регистрацию'); setState('error'); return; }
@@ -82,7 +99,17 @@ function ProductInner() {
           ))}
         </div>
 
-        {pool && !expired && (
+        {!pool && (
+        <div className="border rounded-2xl p-4 flex flex-col gap-3">
+          <p className="text-sm text-zinc-500">На этот товар ещё нет группы. Создайте свою: соберите 10 человек — и каждый получит цену <b className="text-emerald-700">{formatKzt(currentPrice(p.price_kzt, 10))}</b> вместо {formatKzt(p.price_kzt)}.</p>
+          {state !== 'joined'
+            ? <button onClick={createPool} disabled={creating} className="bg-zinc-900 text-white rounded-2xl py-4 font-semibold disabled:opacity-40">{creating ? 'Создаю…' : 'Создать группу'}</button>
+            : null}
+          {state === 'error' && <p className="text-red-500 text-sm">{errText}</p>}
+        </div>
+      )}
+
+      {pool && !expired && (
           <div className="border rounded-2xl p-4 flex flex-col gap-3">
             <p className="font-semibold text-sm">{pool.name}</p>
             {friendNames.length > 0 && (
