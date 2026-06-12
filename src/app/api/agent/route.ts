@@ -1,5 +1,7 @@
 // src/app/api/agent/route.ts
 import { NextResponse } from 'next/server';
+
+export const maxDuration = 60; // SSE-стрим агента на Vercel
 import { adminClient } from '@/lib/supabase';
 import { parseIntent, explain } from '@/lib/llm';
 import { scoreProduct } from '@/lib/scoring';
