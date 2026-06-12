@@ -1,10 +1,10 @@
 // src/lib/ladder.ts
 export type Tier = { threshold: number; multiplier: number; label: string };
 export const TIERS: Tier[] = [
-  { threshold: 1,  multiplier: 1.0,  label: 'Buy alone' },
-  { threshold: 5,  multiplier: 0.93, label: 'Small group' },
-  { threshold: 10, multiplier: 0.85, label: 'Main group' },
-  { threshold: 20, multiplier: 0.78, label: 'Bulk group' },
+  { threshold: 1,  multiplier: 1.0,  label: 'В одиночку' },
+  { threshold: 5,  multiplier: 0.93, label: 'Малая группа' },
+  { threshold: 10, multiplier: 0.85, label: 'Основная группа' },
+  { threshold: 20, multiplier: 0.78, label: 'Большая группа' },
 ];
 const round10 = (n: number) => Math.round(n / 10) * 10;
 
