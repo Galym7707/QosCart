@@ -3,11 +3,11 @@ import { describe, it, expect } from 'vitest';
 import { CATEGORIES, LEGACY_MAP, allQueryJobs, parentLabel, subLabel } from '../src/lib/categories';
 
 describe('categories tree', () => {
-  it('12 родителей, у каждого 3-5 подкатегорий, у каждой 2 запроса', () => {
-    expect(CATEGORIES).toHaveLength(12);
+  it('11 родителей, у каждого 3-8 подкатегорий, у каждой 2 запроса', () => {
+    expect(CATEGORIES).toHaveLength(11);
     for (const c of CATEGORIES) {
       expect(c.subs.length).toBeGreaterThanOrEqual(3);
-      expect(c.subs.length).toBeLessThanOrEqual(5);
+      expect(c.subs.length).toBeLessThanOrEqual(8);
       for (const s of c.subs) expect(s.queries).toHaveLength(2);
     }
   });

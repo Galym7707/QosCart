@@ -5,20 +5,18 @@ export type Category = { slug: string; ru: string; subs: Sub[] };
 export const CATEGORIES: Category[] = [
   { slug: 'electronics', ru: 'Электроника', subs: [
     { slug: 'smartphones', ru: 'Смартфоны', queries: ['budget smartphone 128gb', 'smartphone android'] },
+    { slug: 'tablets', ru: 'Планшеты', queries: ['android tablet 10 inch', 'tablet for students'] },
+    { slug: 'laptops', ru: 'Ноутбуки и ПК', queries: ['laptop 15 inch', 'mini pc desktop'] },
     { slug: 'wearables', ru: 'Часы и трекеры', queries: ['smart watch', 'fitness tracker'] },
     { slug: 'chargers', ru: 'Зарядки и кабели', queries: ['power bank fast charging', 'usb c charger 65w'] },
+    { slug: 'peripherals', ru: 'Периферия', queries: ['mechanical keyboard', 'wireless mouse ergonomic'] },
+    { slug: 'storage', ru: 'Хабы и накопители', queries: ['usb c hub', 'external ssd 1tb'] },
+    { slug: 'office', ru: 'Рабочее место', queries: ['laptop stand aluminum', 'monitor light bar'] },
   ]},
   { slug: 'audio', ru: 'Аудио', subs: [
     { slug: 'earbuds', ru: 'Наушники TWS', queries: ['wireless earbuds', 'noise cancelling earbuds'] },
     { slug: 'headphones', ru: 'Полноразмерные', queries: ['over ear headphones', 'noise cancelling headphones'] },
     { slug: 'speakers', ru: 'Колонки', queries: ['bluetooth speaker', 'portable speaker waterproof'] },
-  ]},
-  { slug: 'computers', ru: 'Компьютеры', subs: [
-    { slug: 'laptops', ru: 'Ноутбуки и ПК', queries: ['laptop 15 inch', 'mini pc desktop'] },
-    { slug: 'tablets', ru: 'Планшеты', queries: ['android tablet 10 inch', 'tablet for students'] },
-    { slug: 'peripherals', ru: 'Периферия', queries: ['mechanical keyboard', 'wireless mouse ergonomic'] },
-    { slug: 'storage', ru: 'Хабы и накопители', queries: ['usb c hub', 'external ssd 1tb'] },
-    { slug: 'office', ru: 'Рабочее место', queries: ['laptop stand aluminum', 'monitor light bar'] },
   ]},
   { slug: 'appliances', ru: 'Бытовая техника', subs: [
     { slug: 'cleaning', ru: 'Уборка', queries: ['robot vacuum budget', 'cordless vacuum cleaner'] },
@@ -68,7 +66,7 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const LEGACY_MAP: Record<string, string> = {
-  tech: 'electronics', study: 'study', home: 'home', fashion: 'fashion', sport: 'sport', beauty: 'beauty',
+  tech: 'electronics', computers: 'electronics', study: 'study', home: 'home', fashion: 'fashion', sport: 'sport', beauty: 'beauty',
 };
 
 export function allQueryJobs(): { cat: string; sub: string; query: string }[] {
