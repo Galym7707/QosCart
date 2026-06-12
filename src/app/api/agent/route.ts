@@ -23,6 +23,16 @@ async function runPipeline(message: string, profile: any, emit: (text: string) =
     .select('*')
     .ilike('title', `%${intent.query_en.split(' ')[0]}%`)
     .limit(30);
+
+  // пословный матчинг с границами слов: «phone» больше не цепляет headphones,
+  // но допускает префиксы iphone/smartphone
+  const tokens = intent.query_en.toLowerCase().split(/\s+/).filter(t => t.length >= 3);
+  if (tokens.length && (products?.length ?? 0) > 2) {
+    const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const strict = (products ?? []).filter(p =>
+      tokens.every(t => new RegExp(`\\b(i|smart|e)?${esc(t)}`, 'i').test(p.title)));
+    if (strict.length >= 2) products = strict;
+  }
   emit(`Ищу в каталоге… ${products?.length ?? 0} кандидатов`);
 
   if ((products?.length ?? 0) < 3 && intent.category) {
