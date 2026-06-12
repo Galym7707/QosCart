@@ -23,8 +23,10 @@ async function runPipeline(message: string, profile: any, emit: (text: string) =
     .limit(30);
   emit(`Ищу в каталоге… ${products?.length ?? 0} кандидатов`);
 
-  if ((products?.length ?? 0) < 3) {
-    const live = await searchShopping(intent.query_en, intent.category ?? 'electronics');
+  if ((products?.length ?? 0) < 3 && intent.category) {
+    // сохраняем live-результаты в каталог ТОЛЬКО при уверенной категории —
+    // иначе каталог зарастает мусором (см. инцидент со шпагатом в «электронике»)
+    const live = await searchShopping(intent.query_en, intent.category);
     if (live.length) {
       emit(`Дозагружаю свежие цены: +${live.length}`);
       const { data: inserted } = await db.from('products').insert(live).select('*');
