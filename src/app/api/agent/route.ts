@@ -19,19 +19,22 @@ async function runPipeline(message: string, profile: any, emit: (text: string) =
   const budget = intent.budget_max ?? profile?.budget_kzt ?? null;
   emit(`Понял запрос: ${intent.query_en}${budget ? `, бюджет до ${formatKzt(budget)}` : ''}`);
 
+  const tokens = intent.query_en.toLowerCase().split(/\s+/).filter(t => t.length >= 3);
+  const orExpr = (tokens.length ? tokens : [intent.query_en]).map(t => `title.ilike.%${t}%`).join(',');
   let { data: products = [] } = await db.from('products')
     .select('*')
-    .ilike('title', `%${intent.query_en.split(' ')[0]}%`)
-    .limit(30);
+    .or(orExpr)
+    .limit(60);
 
-  // пословный матчинг с границами слов: «phone» больше не цепляет headphones,
-  // но допускает префиксы iphone/smartphone
-  const tokens = intent.query_en.toLowerCase().split(/\s+/).filter(t => t.length >= 3);
-  if (tokens.length && (products?.length ?? 0) > 2) {
+  // пословный матчинг с границами слов; приоритет: все слова → главное существительное → ничего
+  // («gaming headphones»: сперва gaming∧headphones, иначе любые headphones — но не gaming-мыши)
+  if (tokens.length) {
     const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const strict = (products ?? []).filter(p =>
-      tokens.every(t => new RegExp(`\\b(i|smart|e)?${esc(t)}`, 'i').test(p.title)));
-    if (strict.length >= 2) products = strict;
+    const matchTok = (title: string, t: string) => new RegExp(`\\b(i|smart|e)?${esc(t)}`, 'i').test(title);
+    const all = (products ?? []).filter(p => tokens.every(t => matchTok(p.title, t)));
+    const head = tokens[tokens.length - 1];
+    const byHead = (products ?? []).filter(p => matchTok(p.title, head));
+    products = all.length ? all : byHead;
   }
   emit(`Ищу в каталоге… ${products?.length ?? 0} кандидатов`);
 
