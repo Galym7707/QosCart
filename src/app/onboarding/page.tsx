@@ -46,7 +46,9 @@ export default function Onboarding() {
     }).select('id').single();
     if (error || !data) { setErr(error?.message ?? 'error'); return; }
     localStorage.setItem('qos_user', JSON.stringify({ id: data.id, name, interests: sel, budget_kzt: budget, city: 'Almaty' }));
-    r.push('/feed');
+    const next = localStorage.getItem('qos_next');
+    localStorage.removeItem('qos_next');
+    r.push(next || '/feed');
   }
 
   if (step === 'form') return (

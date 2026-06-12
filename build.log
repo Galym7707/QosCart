@@ -1,0 +1,65 @@
+
+> build
+> next build
+
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+  ▲ Next.js 14.2.35
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ ⚠ Found lockfile missing swc dependencies, patching...
+ ⨯ Failed to patch lockfile, please try uninstalling and reinstalling next in this workspace
+TypeError: Cannot read properties of undefined (reading 'os')
+    at fetchPkgInfo (C:\Users\Alyhan\Documents\Claude\Projects\Esimi\qoscart\node_modules\next\dist\lib\patch-incorrect-lockfile.js:73:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async Promise.all (index 3)
+    at async patchIncorrectLockfile (C:\Users\Alyhan\Documents\Claude\Projects\Esimi\qoscart\node_modules\next\dist\lib\patch-incorrect-lockfile.js:162:26)
+ ⚠ Found lockfile missing swc dependencies, patching...
+ ⚠ Found lockfile missing swc dependencies, patching...
+ ⨯ Failed to patch lockfile, please try uninstalling and reinstalling next in this workspace
+TypeError: Cannot read properties of undefined (reading 'os')
+    at fetchPkgInfo (C:\Users\Alyhan\Documents\Claude\Projects\Esimi\qoscart\node_modules\next\dist\lib\patch-incorrect-lockfile.js:73:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async Promise.all (index 7)
+    at async patchIncorrectLockfile (C:\Users\Alyhan\Documents\Claude\Projects\Esimi\qoscart\node_modules\next\dist\lib\patch-incorrect-lockfile.js:162:26)
+ ✓ Compiled successfully
+   Skipping linting
+   Checking validity of types ...
+   Collecting page data ...
+ ⚠ Found lockfile missing swc dependencies, patching...
+   Generating static pages (0/9) ...
+   Generating static pages (2/9) 
+   Generating static pages (4/9) 
+   Generating static pages (6/9) 
+ ✓ Generating static pages (9/9)
+   Finalizing page optimization ...
+   Collecting build traces ...
+ ⨯ Failed to patch lockfile, please try uninstalling and reinstalling next in this workspace
+TypeError: Cannot read properties of undefined (reading 'os')
+    at fetchPkgInfo (C:\Users\Alyhan\Documents\Claude\Projects\Esimi\qoscart\node_modules\next\dist\lib\patch-incorrect-lockfile.js:73:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async Promise.all (index 7)
+    at async patchIncorrectLockfile (C:\Users\Alyhan\Documents\Claude\Projects\Esimi\qoscart\node_modules\next\dist\lib\patch-incorrect-lockfile.js:162:26)
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    175 B          96.2 kB
+├ ○ /_not-found                          873 B          88.2 kB
+├ ƒ /api/agent                           0 B                0 B
+├ ƒ /api/pools/join                      0 B                0 B
+├ ○ /chat                                2.99 kB          99 kB
+├ ○ /feed                                2.31 kB         159 kB
+├ ○ /onboarding                          1.73 kB         150 kB
+└ ƒ /product/[id]                        3.01 kB         151 kB
++ First Load JS shared by all            87.3 kB
+  ├ chunks/117-6d3152f80147ba9e.js       31.7 kB
+  ├ chunks/fd9d1056-9f91b5e418130764.js  53.6 kB
+  └ other shared chunks (total)          1.95 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

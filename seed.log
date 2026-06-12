@@ -1,0 +1,30 @@
+
+> seed
+> tsx scripts/seed.ts
+
+tech / "wireless earbuds": +40
+tech / "power bank fast charging": +40
+tech / "mechanical keyboard": +40
+tech / "smart watch": +40
+tech / "usb c hub": +40
+tech / "bluetooth speaker": +40
+study / "student backpack usb": +40
+study / "desk lamp led": +40
+study / "noise cancelling headphones study": +40
+node:internal/deps/undici/undici:15845
+      Error.captureStackTrace(err);
+            ^
+
+TypeError: fetch failed
+    at node:internal/deps/undici/undici:15845:13
+    at async searchShopping (C:\Users\Alyhan\Documents\Claude\Projects\Esimi\qoscart\src\lib\serpapi.ts:8:15)
+    at async main (C:\Users\Alyhan\Documents\Claude\Projects\Esimi\qoscart\scripts\seed.ts:38:21) {
+  [cause]: Error: read ECONNRESET
+      at TLSWrap.onStreamRead (node:internal/stream_base_commons:216:20) {
+    errno: -4077,
+    code: 'ECONNRESET',
+    syscall: 'read'
+  }
+}
+
+Node.js v25.0.0

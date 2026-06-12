@@ -103,7 +103,7 @@ export default function AgentPanel({ fullScreen = false }: { fullScreen?: boolea
     <div className={`flex flex-col ${fullScreen ? 'min-h-[calc(100vh-3.5rem)]' : 'h-full'}`}>
       <div className="flex items-center justify-between px-4 py-2.5 border-b">
         <p className="text-sm font-semibold flex items-center gap-2"><Icon name="agent" size={18} />AI-агент</p>
-        <button onClick={voice.toggleTts} aria-label={voice.ttsOn ? 'Выключить озвучку' : 'Включить озвучку'}
+        <button style={{ marginRight: fullScreen ? 0 : 40 }} onClick={voice.toggleTts} aria-label={voice.ttsOn ? 'Выключить озвучку' : 'Включить озвучку'}
           className="w-9 h-9 rounded-full hover:bg-zinc-100 flex items-center justify-center">{voice.ttsOn ? <Icon name="volume" size={18} /> : <Icon name="volume-off" size={18} />}</button>
       </div>
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3 pb-32">

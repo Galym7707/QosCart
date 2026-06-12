@@ -55,7 +55,11 @@ function ProductInner() {
 
   async function createPool() {
     const u = JSON.parse(localStorage.getItem('qos_user') ?? 'null');
-    if (!u) { setErrText('Сначала пройдите регистрацию'); setState('error'); return; }
+    if (!u) {
+      localStorage.setItem('qos_next', window.location.pathname + window.location.search);
+      window.location.assign('/onboarding');
+      return;
+    }
     setCreating(true);
     const res = await fetch('/api/pools/create', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ productId: id, userId: u.id }) });
     setCreating(false);
@@ -71,7 +75,11 @@ function ProductInner() {
 
   async function join() {
     const u = JSON.parse(localStorage.getItem('qos_user') ?? 'null');
-    if (!u) { setErrText('Сначала пройдите регистрацию'); setState('error'); return; }
+    if (!u) {
+      localStorage.setItem('qos_next', window.location.pathname + window.location.search);
+      window.location.assign('/onboarding');
+      return;
+    }
     const res = await fetch('/api/pools/join', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ poolId: pool.id, userId: u.id, inviterId }) });
     if (res.ok) { setState('joined'); }
     else { const { error } = await res.json(); setErrText({ expired: 'Группа истекла', duplicate: 'Вы уже в группе (1 устройство = 1 слот)', not_verified: 'Нужна верификация', closed: 'Группа закрыта', not_found: 'Группа недоступна' }[error as string] ?? error); setState('error'); }

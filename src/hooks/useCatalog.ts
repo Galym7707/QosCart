@@ -53,7 +53,12 @@ export function useCatalog() {
   }, []);
 
   const onToggleLike = useCallback(async (productId: string) => {
-    if (!user?.id) return;
+    if (!user?.id) {
+      // регистрация нужна только для избранного — отправляем и вернём обратно
+      localStorage.setItem('qos_next', window.location.pathname + window.location.search);
+      window.location.assign('/onboarding');
+      return;
+    }
     const was = likedIds.has(productId);
     setLikedIds(prev => { const n = new Set(prev); was ? n.delete(productId) : n.add(productId); return n; });
     await toggleLike(user.id, productId, was);

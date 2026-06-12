@@ -1,0 +1,29 @@
+
+> seed
+> tsx scripts/seed.ts
+
+tech / "wireless earbuds": skip (уже в базе)
+tech / "power bank fast charging": skip (уже в базе)
+tech / "mechanical keyboard": skip (уже в базе)
+tech / "smart watch": skip (уже в базе)
+tech / "usb c hub": skip (уже в базе)
+tech / "bluetooth speaker": skip (уже в базе)
+study / "student backpack usb": skip (уже в базе)
+study / "desk lamp led": skip (уже в базе)
+study / "noise cancelling headphones study": skip (уже в базе)
+study / "tablet stand": +40
+home / "air humidifier": +40
+home / "electric kettle": +40
+home / "robot vacuum budget": +40
+home / "bed sheets set": +40
+fashion / "sneakers unisex": +40
+fashion / "crossbody bag": +40
+fashion / "sunglasses polarized": +40
+sport / "yoga mat": +40
+sport / "resistance bands set": +40
+sport / "water bottle insulated": +40
+beauty / "hair dryer ionic": +40
+beauty / "led face mask": +40
+beauty / "electric toothbrush": +40
+Products seeded (этим прогоном): 560
+Pools seeded: 4 (7/10 активный, 9/10 почти, 4/10 ранний, истёкший для демо провала)

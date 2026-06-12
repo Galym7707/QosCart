@@ -1,0 +1,23 @@
+﻿node.exe : [33mThe CJS build of Vite's Node API is deprecated. See 
+https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Users\Alyhan\AppData\Roaming ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ([33mThe CJS bu...e details.[39m:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+ RUN  v2.1.9 C:/Users/Alyhan/Documents/Claude/Projects/Esimi/qoscart
+
+ ✓ tests/joinRules.test.ts (6 tests) 5ms
+ ✓ tests/ladder.test.ts (5 tests) 6ms
+ ✓ tests/normalize.test.ts (3 tests) 6ms
+ ✓ tests/currency.test.ts (2 tests) 81ms
+ ✓ tests/scoring.test.ts (4 tests) 75ms
+ ✓ tests/llm-fallback.test.ts (3 tests) 12ms
+
+ Test Files  6 passed (6)
+      Tests  23 passed (23)
+   Start at  16:57:54
+   Duration  1.25s (transform 328ms, setup 0ms, collect 699ms, tests 184ms, environment 2ms, prepare 3.84s)
+

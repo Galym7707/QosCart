@@ -1,0 +1,45 @@
+
+> dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+ ⚠ Found lockfile missing swc dependencies, patching...
+ ✓ Ready in 3.8s
+ ⨯ Failed to patch lockfile, please try uninstalling and reinstalling next in this workspace
+TypeError: Cannot read properties of undefined (reading 'os')
+    at fetchPkgInfo (C:\Users\Alyhan\Documents\Claude\Projects\Esimi\qoscart\node_modules\next\dist\lib\patch-incorrect-lockfile.js:73:25)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async Promise.all (index 7)
+    at async patchIncorrectLockfile (C:\Users\Alyhan\Documents\Claude\Projects\Esimi\qoscart\node_modules\next\dist\lib\patch-incorrect-lockfile.js:162:26)
+ ○ Compiling / ...
+ ✓ Compiled / in 2.9s (497 modules)
+ GET / 200 in 3106ms
+ ✓ Compiled /_not-found in 291ms (500 modules)
+ GET /_next/static/webpack/44d9c90f69970dd1.webpack.hot-update.json 404 in 452ms
+ GET / 200 in 39ms
+ GET / 200 in 59ms
+ ○ Compiling /onboarding ...
+ ✓ Compiled /onboarding in 841ms (585 modules)
+ GET /sw.js 404 in 318ms
+ ✓ Compiled /api/otp/send in 208ms (323 modules)
+ POST /api/otp/send 200 in 1442ms
+ ✓ Compiled /api/otp/check in 118ms (325 modules)
+ POST /api/otp/check 200 in 140ms
+ POST /api/otp/check 200 in 8ms
+ ✓ Compiled /feed in 293ms (628 modules)
+ ✓ Compiled /chat in 200ms (634 modules)
+ ○ Compiling /api/agent ...
+ ✓ Compiled /api/agent in 1036ms (516 modules)
+(node:20460) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ POST /api/agent 200 in 4033ms
+ POST /api/agent 200 in 2765ms
+ ✓ Compiled /api/otp/send in 152ms (332 modules)
+ POST /api/otp/send 200 in 1302ms
+ POST /api/otp/send 200 in 1119ms
+ ✓ Compiled /api/otp/check in 189ms (334 modules)
+ POST /api/otp/check 200 in 737ms
