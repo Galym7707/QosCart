@@ -88,3 +88,26 @@ describe('URL state', () => {
     expect(back.sort).toBe('relevance');
   });
 });
+
+describe('русский поиск (matchesQuery через applyFilters)', () => {
+  const ru = [
+    P({ id: 's1', title: 'Samsung Galaxy A55 128GB Smartphone' }),
+    P({ id: 's2', title: 'Sony WH-1000XM5 Noise Cancelling Headphones' }),
+    P({ id: 's3', title: 'ASUS VivoBook 15 Laptop 16GB RAM' }),
+  ];
+  it('транслитерация брендов: «самсунг» находит Samsung', () => {
+    expect(applyFilters(ru, F({ q: 'самсунг' }), ctx).map(i => i.id)).toEqual(['s1']);
+  });
+  it('словарь: «наушники сони» → Sony Headphones (И между токенами)', () => {
+    expect(applyFilters(ru, F({ q: 'наушники сони' }), ctx).map(i => i.id)).toEqual(['s2']);
+  });
+  it('«ноутбук асус» через словарь+бренд', () => {
+    expect(applyFilters(ru, F({ q: 'ноутбук асус' }), ctx).map(i => i.id)).toEqual(['s3']);
+  });
+  it('латиница работает как раньше', () => {
+    expect(applyFilters(ru, F({ q: 'galaxy' }), ctx).map(i => i.id)).toEqual(['s1']);
+  });
+  it('нерелевантный запрос → пусто', () => {
+    expect(applyFilters(ru, F({ q: 'холодильник самсунг' }), ctx)).toHaveLength(0);
+  });
+});

@@ -33,8 +33,10 @@ export type ProductLike = {
 };
 export type CatalogCtx = { likedIds: Set<string>; poolParticipants: Map<string, number> };
 
+import { matchesQuery } from './search';
+
 export function applyFilters<T extends ProductLike>(items: T[], f: FilterState, ctx: CatalogCtx): T[] {
-  const q = f.q.trim().toLowerCase();
+  const q = f.q.trim();
   return items.filter(p =>
     (!f.cat || p.category === f.cat) &&
     (!f.sub || p.subcategory === f.sub) &&
@@ -45,7 +47,7 @@ export function applyFilters<T extends ProductLike>(items: T[], f: FilterState, 
     (!f.liked || ctx.likedIds.has(p.id)) &&
     (!f.colors.length || (p.color != null && f.colors.includes(p.color))) &&
     Object.entries(f.attrs).every(([k, vals]) => !vals.length || vals.includes(String((p.attrs ?? {})[k] ?? ''))) &&
-    (!q || p.title.toLowerCase().includes(q))
+    (!q || matchesQuery(p.title, q))
   );
 }
 
