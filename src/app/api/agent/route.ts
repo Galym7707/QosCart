@@ -31,12 +31,17 @@ async function runPipeline(message: string, profile: any, emit: (text: string) =
     headphone: 'headphones', headphones: 'headphones', headset: 'headphones',
     speaker: 'speakers', speakers: 'speakers',
     keyboard: 'peripherals', mouse: 'peripherals',
-    watch: 'wearables', smartwatch: 'wearables', tracker: 'wearables', band: 'wearables',
+    watch: 'wearables', smartwatch: 'wearables', tracker: 'wearables', band: 'wearables', tws: 'earbuds',
     charger: 'chargers', powerbank: 'chargers',
     hub: 'storage', ssd: 'storage',
     kettle: 'small_appliances', vacuum: 'cleaning', humidifier: 'climate', backpack: 'backpacks',
+    iron: 'garment', steamer: 'garment', toothbrush: 'oral', flosser: 'oral', luggage: 'luggage', suitcase: 'luggage', scooter: 'outdoors_kids',
   };
-  const subHit = tokens.map(t => SUB_HINTS[t]).find(Boolean);
+  // специфичные подтипы бьют общие слова («tws headphones» → вкладыши),
+  // иначе главное существительное — в конце («laptop backpack» → рюкзаки)
+  const SPECIFIC = new Set(['tws', 'earbuds', 'airpods', 'smartwatch', 'macbook', 'chromebook', 'iphone', 'ipad', 'powerbank']);
+  const specific = tokens.find(t => SPECIFIC.has(t));
+  const subHit = specific ? SUB_HINTS[specific] : [...tokens].reverse().map(t => SUB_HINTS[t]).find(Boolean);
 
   let products: any[] | null = [];
   if (subHit) {
@@ -46,15 +51,20 @@ async function runPipeline(message: string, profile: any, emit: (text: string) =
     ({ data: products = [] } = await db.from('products').select('*').or(orExpr).limit(60));
   }
 
-  // пословный матчинг с границами слов; приоритет: все слова → главное существительное → ничего
-  // («gaming headphones»: сперва gaming∧headphones, иначе любые headphones — но не gaming-мыши)
-  if (tokens.length && !subHit) {
+  // пословный матчинг с границами слов:
+  // - на полке (subHit): «mechanical keyboard» сужает peripherals до клавиатур; мало матчей → вся полка
+  // - без полки: все слова → главное существительное → ничего
+  if (tokens.length) {
     const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const matchTok = (title: string, t: string) => new RegExp(`\\b(i|smart|e)?${esc(t)}`, 'i').test(title);
     const all = (products ?? []).filter(p => tokens.every(t => matchTok(p.title, t)));
-    const head = tokens[tokens.length - 1];
-    const byHead = (products ?? []).filter(p => matchTok(p.title, head));
-    products = all.length ? all : byHead;
+    if (subHit) {
+      if (all.length >= 2) products = all;
+    } else {
+      const head = tokens[tokens.length - 1];
+      const byHead = (products ?? []).filter(p => matchTok(p.title, head));
+      products = all.length ? all : byHead;
+    }
   }
   emit(`Ищу в каталоге… ${products?.length ?? 0} кандидатов`);
 
