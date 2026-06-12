@@ -26,7 +26,7 @@ describe('normalizeShoppingResult', () => {
       rating: 4.6,
       reviews_count: 1280,
     });
-    expect(p.raw).toEqual(raw);
+    expect(p!.raw).toEqual(raw);
   });
   it('возвращает null без цены или названия (мусор не пускаем в каталог)', () => {
     expect(normalizeShoppingResult({ ...raw, extracted_price: undefined, price: undefined }, 'tech', 520)).toBeNull();
